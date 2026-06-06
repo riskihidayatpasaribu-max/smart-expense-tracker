@@ -20,8 +20,11 @@ const BACKEND_URL = "";
 
 
 document.addEventListener("DOMContentLoaded", async function () {
-  setTanggalHariIni();
+
   pilihModeLogin("admin");
+
+
+  setTanggalHariIni();
 
   aktifkanKategoriOtomatis();
   setFilterBulanIni();
