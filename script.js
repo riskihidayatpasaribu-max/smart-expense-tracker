@@ -11,10 +11,18 @@ let modeEdit = false;
 let idEdit = null;
 let currentUser = null;
 
+let modeLogin = "admin";
+let currentProfile = null;
+let daftarProfiles = [];
+
+const BACKEND_URL = "";
+
 
 
 document.addEventListener("DOMContentLoaded", async function () {
   setTanggalHariIni();
+  pilihModeLogin("admin");
+
   aktifkanKategoriOtomatis();
   setFilterBulanIni();
   tampilkanTargetBulanan();
@@ -28,6 +36,237 @@ document.addEventListener("DOMContentLoaded", async function () {
   await cekSessionLogin();
 
 });
+
+async function ambilProfileUser() {
+  if (!currentUser) {
+    return null;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .select("*")
+    .eq("user_id", currentUser.id)
+    .single();
+
+  if (error) {
+    return null;
+  }
+
+  return data;
+}
+
+function userSedangAdmin() {
+  return currentProfile &&
+    currentProfile.role === "admin" &&
+    currentProfile.status === "active";
+}
+
+async function cekAksesSetelahLogin() {
+  currentProfile = await ambilProfileUser();
+
+  if (!currentProfile) {
+    await supabaseClient.auth.signOut();
+    currentUser = null;
+
+    tampilkanPopup(
+      "Akun ini belum memiliki profil. Hubungi admin.",
+      "error"
+    );
+
+    tampilkanModeLogout();
+    return false;
+  }
+
+  if (currentProfile.status !== "active") {
+    await supabaseClient.auth.signOut();
+    currentUser = null;
+
+    tampilkanPopup(
+      "Akun ini sedang dinonaktifkan oleh admin.",
+      "error"
+    );
+
+    tampilkanModeLogout();
+    return false;
+  }
+
+  if (modeLogin === "admin" && currentProfile.role !== "admin") {
+    await supabaseClient.auth.signOut();
+    currentUser = null;
+
+    tampilkanPopup(
+      "Login ditolak. Akun ini bukan admin.",
+      "error"
+    );
+
+    tampilkanModeLogout();
+    return false;
+  }
+
+  if (modeLogin === "user" && currentProfile.role !== "user") {
+    await supabaseClient.auth.signOut();
+    currentUser = null;
+
+    tampilkanPopup(
+      "Login ditolak. Akun ini bukan user biasa.",
+      "error"
+    );
+
+    tampilkanModeLogout();
+    return false;
+  }
+
+  return true;
+}
+
+function setLoginLoading(isLoading) {
+  const btnLogin = document.getElementById("btnLogin");
+  const btnRegister = document.getElementById("btnRegister");
+  const btnModeAdmin = document.getElementById("btnModeAdmin");
+  const btnModeUser = document.getElementById("btnModeUser");
+
+  if (!btnLogin) {
+    return;
+  }
+
+  if (isLoading) {
+    btnLogin.dataset.textAsli = btnLogin.innerText;
+    btnLogin.innerText = "Memproses...";
+    btnLogin.disabled = true;
+
+    if (btnRegister) btnRegister.disabled = true;
+    if (btnModeAdmin) btnModeAdmin.disabled = true;
+    if (btnModeUser) btnModeUser.disabled = true;
+  } else {
+    if (btnLogin.dataset.textAsli) {
+      btnLogin.innerText = btnLogin.dataset.textAsli;
+    } else {
+      btnLogin.innerText = modeLogin === "admin" ? "Login Admin" : "Login User";
+    }
+
+    btnLogin.disabled = false;
+
+    if (btnRegister) btnRegister.disabled = false;
+    if (btnModeAdmin) btnModeAdmin.disabled = false;
+    if (btnModeUser) btnModeUser.disabled = false;
+  }
+}
+
+function bukaTabAdmin(tab) {
+  const dashboardContent = document.getElementById("dashboardContent");
+  const adminUserControl = document.getElementById("adminUserControl");
+  const btnTabDashboard = document.getElementById("btnTabDashboard");
+  const btnTabUser = document.getElementById("btnTabUser");
+
+  if (!dashboardContent || !adminUserControl) {
+    return;
+  }
+
+  if (tab === "dashboard") {
+    dashboardContent.style.display = "block";
+    adminUserControl.style.display = "none";
+
+    if (btnTabDashboard) btnTabDashboard.classList.add("active");
+    if (btnTabUser) btnTabUser.classList.remove("active");
+  } else {
+    dashboardContent.style.display = "none";
+    adminUserControl.style.display = "block";
+
+    if (btnTabDashboard) btnTabDashboard.classList.remove("active");
+    if (btnTabUser) btnTabUser.classList.add("active");
+
+    muatDaftarUserAdmin();
+  }
+}
+
+function tampilkanPopup(pesan, tipe = "info", judul = "") {
+  const container = document.getElementById("toastContainer");
+
+  if (!container) {
+    console.log(pesan);
+    return;
+  }
+
+  const toast = document.createElement("div");
+  toast.className = `toast ${tipe}`;
+
+  const title = document.createElement("div");
+  title.className = "toast-title";
+
+  const message = document.createElement("div");
+  message.className = "toast-message";
+
+  if (judul !== "") {
+    title.innerText = judul;
+  } else {
+    if (tipe === "success") title.innerText = "Berhasil";
+    else if (tipe === "error") title.innerText = "Gagal";
+    else if (tipe === "warning") title.innerText = "Perhatian";
+    else title.innerText = "Informasi";
+  }
+
+  message.innerText = pesan;
+
+  toast.appendChild(title);
+  toast.appendChild(message);
+  container.appendChild(toast);
+
+  setTimeout(function () {
+    toast.classList.add("keluar");
+
+    setTimeout(function () {
+      toast.remove();
+    }, 250);
+  }, 3500);
+}
+
+function tampilkanKonfirmasi(pesan, judul = "Konfirmasi") {
+  return new Promise(function (resolve) {
+    const modal = document.getElementById("confirmModal");
+    const title = document.getElementById("confirmTitle");
+    const message = document.getElementById("confirmMessage");
+    const btnCancel = document.getElementById("confirmCancelBtn");
+    const btnOk = document.getElementById("confirmOkBtn");
+
+    if (!modal || !title || !message || !btnCancel || !btnOk) {
+      resolve(confirm(pesan));
+      return;
+    }
+
+    title.innerText = judul;
+    message.innerText = pesan;
+
+    modal.classList.add("show");
+
+    function tutupModal(hasil) {
+      modal.classList.remove("show");
+
+      btnCancel.removeEventListener("click", batal);
+      btnOk.removeEventListener("click", lanjut);
+      modal.removeEventListener("click", klikLuar);
+
+      resolve(hasil);
+    }
+
+    function batal() {
+      tutupModal(false);
+    }
+
+    function lanjut() {
+      tutupModal(true);
+    }
+
+    function klikLuar(event) {
+      if (event.target === modal) {
+        tutupModal(false);
+      }
+    }
+
+    btnCancel.addEventListener("click", batal);
+    btnOk.addEventListener("click", lanjut);
+    modal.addEventListener("click", klikLuar);
+  });
+}
 
 function aktifkanKategoriOtomatis() {
   const inputNama = document.getElementById("nama");
@@ -44,12 +283,12 @@ async function simpanTargetBulanan() {
   const nilaiTarget = Number(inputTarget.value);
 
   if (!currentUser) {
-    alert("Kamu harus login terlebih dahulu.");
+    tampilkanPopup("Kamu harus login terlebih dahulu.");
     return;
   }
 
   if (nilaiTarget <= 0) {
-    alert("Masukkan target bulanan yang valid.");
+    tampilkanPopup("Masukkan target bulanan yang valid.");
     return;
   }
 
@@ -62,7 +301,7 @@ async function simpanTargetBulanan() {
     });
 
   if (error) {
-    alert("Gagal menyimpan target bulanan: " + error.message);
+    tampilkanPopup("Gagal menyimpan target bulanan: " + error.message);
     return;
   }
 
@@ -71,7 +310,7 @@ async function simpanTargetBulanan() {
   tampilkanTargetBulanan();
   analisisPengeluaran();
 
-  alert("Target bulanan berhasil disimpan online.");
+  tampilkanPopup("Target bulanan berhasil disimpan online.");
 }
 
 async function muatTargetBulananDariSupabase() {
@@ -86,7 +325,7 @@ async function muatTargetBulananDariSupabase() {
     .maybeSingle();
 
   if (error) {
-    alert("Gagal mengambil target bulanan: " + error.message);
+    tampilkanPopup("Gagal mengambil target bulanan: " + error.message);
     return;
   }
 
@@ -128,12 +367,12 @@ async function tambahPengeluaran() {
   const kategori = document.getElementById("kategori").value;
 
   if (!currentUser) {
-    alert("Kamu harus login terlebih dahulu.");
+    tampilkanPopup("Kamu harus login terlebih dahulu.");
     return;
   }
 
   if (tanggal === "" || namaInput === "" || hargaSatuan <= 0 || qty <= 0) {
-    alert("Tanggal, nama pengeluaran, harga satuan, dan jumlah item wajib diisi.");
+    tampilkanPopup("Tanggal, nama pengeluaran, harga satuan, dan jumlah item wajib diisi.");
     return;
   }
 
@@ -142,7 +381,7 @@ async function tambahPengeluaran() {
   const hasilDeteksiHarga = deteksiHargaTidakWajar(namaInput, hargaSatuan);
 
   if (hasilDeteksiHarga.tidakWajar) {
-    const lanjutSimpan = confirm(hasilDeteksiHarga.pesan);
+    const lanjutSimpan = tampilkanKonfirmasi(hasilDeteksiHarga.pesan);
 
     if (!lanjutSimpan) {
       return;
@@ -152,38 +391,38 @@ async function tambahPengeluaran() {
   const hasilDeteksiHarian = deteksiTotalHarianTidakWajar(tanggal, totalBaru);
 
   if (hasilDeteksiHarian.tidakWajar) {
-    const lanjutSimpanHarian = confirm(hasilDeteksiHarian.pesan);
+    const lanjutSimpanHarian = tampilkanKonfirmasi(hasilDeteksiHarian.pesan);
 
     if (!lanjutSimpanHarian) {
       return;
     }
   }
 
-  const hasilNamaRiwayat = cariNamaDariRiwayat(namaInput);
-  const namaRapi = hasilNamaRiwayat.nama;
+  const hasilBackend = await analisisPengeluaranDenganBackend(
+    tanggal,
+    namaInput,
+    hargaSatuan,
+    qty,
+    kategori
+  );
 
-  const kategoriFinal = hasilNamaRiwayat.ditemukan
-    ? hasilNamaRiwayat.kategori
-    : kategori;
+  const namaFinal = hasilBackend.nama_final || namaInput;
+  const kategoriFinal = hasilBackend.kategori_final || kategori;
+  const hasilGabung = hasilBackend.gabung || { gabung: false };
 
-  const itemMirip = cariItemMiripDiHariYangSama(tanggal, namaRapi);
+  if (hasilGabung.gabung) {
+    const qtyLama = Number(hasilGabung.qty_lama) || 1;
+    const jumlahLama = Number(hasilGabung.jumlah_lama) || 0;
 
-  if (itemMirip) {
-    const qtyGabungan = Number(itemMirip.qty) + qty;
+    const qtyGabungan = qtyLama + qty;
+    const totalGabungan = jumlahLama + totalBaru;
 
-    // Harga satuan tetap mengikuti input terbaru
-    const hargaSatuanFinal = hargaSatuan;
-
-    // Total dihitung ulang dari harga satuan dan qty gabungan
-    const totalGabungan = hargaSatuanFinal * qtyGabungan;
-
-    const lanjut = confirm(
+    const lanjut = tampilkanKonfirmasi(
       `Item mirip ditemukan pada tanggal yang sama:\n\n` +
-      `"${namaInput}" akan digabung ke "${itemMirip.nama}".\n\n` +
-      `Qty lama: ${itemMirip.qty}\n` +
+      `"${namaInput}" akan digabung ke "${hasilGabung.nama_lama}".\n\n` +
+      `Qty lama: ${qtyLama}\n` +
       `Qty tambahan: ${qty}\n` +
       `Qty baru: ${qtyGabungan}\n\n` +
-      `Harga satuan: ${formatRupiah(hargaSatuanFinal)}\n` +
       `Total baru: ${formatRupiah(totalGabungan)}\n\n` +
       `Lanjut gabungkan data?`
     );
@@ -195,24 +434,24 @@ async function tambahPengeluaran() {
     const { error } = await supabaseClient
       .from("expenses")
       .update({
-        nama: itemMirip.nama,
-        kategori: itemMirip.kategori,
-        harga_satuan: hargaSatuanFinal,
+        nama: hasilGabung.nama_lama,
+        kategori: hasilGabung.kategori_lama || kategoriFinal,
+        harga_satuan: hargaSatuan,
         qty: qtyGabungan,
         jumlah: totalGabungan
       })
-      .eq("id", itemMirip.id)
+      .eq("id", hasilGabung.item_id)
       .eq("user_id", currentUser.id);
 
     if (error) {
-      alert("Gagal menggabungkan data: " + error.message);
+      tampilkanPopup("Gagal menggabungkan data: " + error.message);
       return;
     }
   } else {
     const { error } = await supabaseClient.from("expenses").insert({
       user_id: currentUser.id,
       tanggal: tanggal,
-      nama: namaRapi,
+      nama: namaFinal,
       harga_satuan: hargaSatuan,
       qty: qty,
       jumlah: totalBaru,
@@ -220,7 +459,7 @@ async function tambahPengeluaran() {
     });
 
     if (error) {
-      alert("Gagal menyimpan data: " + error.message);
+      tampilkanPopup("Gagal menyimpan data: " + error.message);
       return;
     }
   }
@@ -249,7 +488,7 @@ function editData(id) {
   });
 
   if (!dataDipilih) {
-    alert("Data tidak ditemukan.");
+    tampilkanPopup("Data tidak ditemukan.");
     return;
   }
 
@@ -279,12 +518,12 @@ async function updatePengeluaran() {
   const kategori = document.getElementById("kategori").value;
 
   if (!currentUser) {
-    alert("Kamu harus login terlebih dahulu.");
+    tampilkanPopup("Kamu harus login terlebih dahulu.");
     return;
   }
 
   if (tanggal === "" || nama === "" || hargaSatuan <= 0 || qty <= 0) {
-    alert("Tanggal, nama pengeluaran, harga satuan, dan jumlah item wajib diisi.");
+    tampilkanPopup("Tanggal, nama pengeluaran, harga satuan, dan jumlah item wajib diisi.");
     return;
   }
 
@@ -304,7 +543,7 @@ async function updatePengeluaran() {
     .eq("user_id", currentUser.id);
 
   if (error) {
-    alert("Gagal memperbarui data: " + error.message);
+    tampilkanPopup("Gagal memperbarui data: " + error.message);
     return;
   }
 
@@ -314,7 +553,7 @@ async function updatePengeluaran() {
   await muatDataPengeluaranDariSupabase();
   refreshTampilan();
 
-  alert("Data berhasil diperbarui.");
+  tampilkanPopup("Data berhasil diperbarui.");
 }
 
 function batalEdit() {
@@ -428,14 +667,17 @@ function tampilkanData() {
 }
 
 async function hapusData(id) {
-  const konfirmasi = confirm("Yakin ingin menghapus data ini?");
+  const yakin = await tampilkanKonfirmasi(
+    "Data pengeluaran ini akan dihapus permanen. Apakah kamu yakin?",
+    "Hapus Pengeluaran"
+  );
 
-  if (!konfirmasi) {
+  if (!yakin) {
     return;
   }
 
   if (!currentUser) {
-    alert("Kamu harus login terlebih dahulu.");
+    tampilkanPopup("Kamu harus login terlebih dahulu.");
     return;
   }
 
@@ -446,7 +688,7 @@ async function hapusData(id) {
     .eq("user_id", currentUser.id);
 
   if (error) {
-    alert("Gagal menghapus data: " + error.message);
+    tampilkanPopup("Gagal menghapus data: " + error.message);
     return;
   }
 
@@ -1630,6 +1872,43 @@ function deteksiKategoriOtomatis(namaPengeluaran) {
       "utan", "utang", "utangg", "utanng", "uteng", "utng", "uttang", "uutang", "wfi", "wif", "wiffi",
       "wifi", "wifi bulanan", "wifii", "wify", "wii", "wiifi", "wivi", "wwifi", "wyfi"
     ],
+    "Utang/Bon": [
+      "utang",
+      "hutang",
+      "bon",
+      "ngebon",
+      "ngutang",
+      "pinjam",
+      "pinjaman",
+      "dipinjam",
+      "meminjam",
+      "bayar utang",
+      "bayar hutang",
+      "bayar bon",
+      "cicil utang",
+      "cicil hutang",
+      "cicilan utang",
+      "cicilan hutang",
+      "kasbon",
+      "kas bon",
+      "tempo",
+      "bayar tempo",
+      "bon warung",
+      "bon kantin",
+      "bon makan",
+      "utang makan",
+      "hutang makan",
+      "utang teman",
+      "hutang ke teman",
+      "pinjam uang",
+      "bayar pinjaman",
+      "pelunasan",
+      "lunas",
+      "melunasi",
+      "tagihan utang",
+      "tagihan hutang"
+    ],
+
     "Lainnya": [
       "aacara", "aadministrasi", "aamplop", "aara", "acaa", "acaara", "acar", "acara", "acaraa", "acare",
       "acarra", "accara", "acera", "acra", "addministrasi", "adiah", "adinistrasi", "admiinistrasi",
@@ -2006,7 +2285,7 @@ function terapkanFilter() {
   const inputTahun = Number(document.getElementById("filterTahun").value);
 
   if (inputBulan < 1 || inputBulan > 12 || inputTahun <= 0) {
-    alert("Bulan atau tahun tidak valid.");
+    tampilkanPopup("Bulan atau tahun tidak valid.");
     return;
   }
 
@@ -2135,76 +2414,364 @@ function deteksiPengeluaranTidakWajar(jumlahBaru) {
   };
 }
 
+function pilihModeLogin(mode) {
+  modeLogin = mode;
+
+  const adminLoginBox = document.getElementById("adminLoginBox");
+  const userLoginBox = document.getElementById("userLoginBox");
+  const btnModeAdmin = document.getElementById("btnModeAdmin");
+  const btnModeUser = document.getElementById("btnModeUser");
+  const btnRegister = document.getElementById("btnRegister");
+  const btnLogin = document.getElementById("btnLogin");
+  const authMessage = document.getElementById("authMessage");
+  const loginReminder = document.getElementById("loginReminder");
+
+  authMessage.innerText = "";
+
+  if (mode === "admin") {
+    adminLoginBox.style.display = "block";
+    userLoginBox.style.display = "none";
+
+    btnModeAdmin.classList.add("active");
+    btnModeUser.classList.remove("active");
+
+    btnRegister.style.display = "none";
+    btnLogin.innerText = "Login Admin";
+
+    if (loginReminder) {
+      loginReminder.style.display = "none";
+    }
+
+  } else {
+    adminLoginBox.style.display = "none";
+    userLoginBox.style.display = "block";
+
+    btnModeAdmin.classList.remove("active");
+    btnModeUser.classList.add("active");
+
+    btnRegister.style.display = "block";
+    btnRegister.innerText = "Register User";
+    btnLogin.innerText = "Login User";
+
+    if (loginReminder) {
+      loginReminder.style.display = "block";
+    }
+  }
+}
+
+function buatEmailUserDariUsername(username) {
+  return username
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "")
+    .replace(/[^a-z0-9._-]/g, "") + "@user.local";
+}
+
+function ambilCredentialLogin() {
+  if (modeLogin === "admin") {
+    return {
+      tipe: "Admin",
+      email: document.getElementById("emailInput").value.trim(),
+      password: document.getElementById("adminPasswordInput").value.trim(),
+      namaTampil: document.getElementById("emailInput").value.trim()
+    };
+  }
+
+  const username = document.getElementById("usernameInput").value.trim();
+  const emailUser = buatEmailUserDariUsername(username);
+
+  return {
+    tipe: "User",
+    email: emailUser,
+    password: document.getElementById("userPasswordInput").value.trim(),
+    namaTampil: username
+  };
+}
+
+function pilihModeLogin(mode) {
+  modeLogin = mode;
+
+  const adminLoginBox = document.getElementById("adminLoginBox");
+  const userLoginBox = document.getElementById("userLoginBox");
+  const btnModeAdmin = document.getElementById("btnModeAdmin");
+  const btnModeUser = document.getElementById("btnModeUser");
+  const btnRegister = document.getElementById("btnRegister");
+  const btnLogin = document.getElementById("btnLogin");
+  const authMessage = document.getElementById("authMessage");
+  const loginReminder = document.getElementById("loginReminder");
+
+  if (authMessage) {
+    authMessage.innerText = "";
+  }
+
+  if (mode === "admin") {
+    if (adminLoginBox) adminLoginBox.style.display = "block";
+    if (userLoginBox) userLoginBox.style.display = "none";
+
+    if (btnModeAdmin) btnModeAdmin.classList.add("active");
+    if (btnModeUser) btnModeUser.classList.remove("active");
+
+    if (btnRegister) btnRegister.style.display = "none";
+    if (btnLogin) btnLogin.innerText = "Login Admin";
+
+    if (loginReminder) loginReminder.style.display = "none";
+  } else {
+    if (adminLoginBox) adminLoginBox.style.display = "none";
+    if (userLoginBox) userLoginBox.style.display = "block";
+
+    if (btnModeAdmin) btnModeAdmin.classList.remove("active");
+    if (btnModeUser) btnModeUser.classList.add("active");
+
+    if (btnRegister) {
+      btnRegister.style.display = "block";
+      btnRegister.innerText = "Register User";
+    }
+
+    if (btnLogin) btnLogin.innerText = "Login User";
+
+    if (loginReminder) loginReminder.style.display = "block";
+  }
+}
+
+function buatEmailUserDariUsername(username) {
+  return username
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "")
+    .replace(/[^a-z0-9._-]/g, "") + "@user.local";
+}
+
+function ambilCredentialLogin() {
+  if (modeLogin === "admin") {
+    return {
+      tipe: "Admin",
+      email: document.getElementById("emailInput").value.trim(),
+      password: document.getElementById("adminPasswordInput").value.trim()
+    };
+  }
+
+  const username = document.getElementById("usernameInput").value.trim();
+
+  return {
+    tipe: "User",
+    email: buatEmailUserDariUsername(username),
+    password: document.getElementById("userPasswordInput").value.trim()
+  };
+}
+
+async function ambilProfileUser() {
+  if (!currentUser) {
+    return null;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .select("*")
+    .eq("user_id", currentUser.id)
+    .single();
+
+  if (error) {
+    return null;
+  }
+
+  return data;
+}
+
+function userSedangAdmin() {
+  return currentProfile &&
+    currentProfile.role === "admin" &&
+    currentProfile.status === "active";
+}
+
 async function registerUser() {
-  const email = document.getElementById("emailInput").value.trim();
-  const password = document.getElementById("passwordInput").value.trim();
+  const credential = ambilCredentialLogin();
   const authMessage = document.getElementById("authMessage");
 
-  if (email === "" || password === "") {
-    authMessage.innerText = "Email dan password wajib diisi.";
+  if (modeLogin === "admin") {
+    const pesan = "Admin tidak bisa register dari halaman ini. Silakan login dengan akun admin yang sudah terdaftar.";
+    authMessage.innerText = pesan;
+    tampilkanPopup(pesan, "warning");
     return;
   }
 
-  if (password.length < 6) {
-    authMessage.innerText = "Password minimal 6 karakter.";
+  const username = document.getElementById("usernameInput").value.trim();
+
+  if (username === "") {
+    const pesan = "Username wajib diisi.";
+    authMessage.innerText = pesan;
+    tampilkanPopup(pesan, "warning");
+    return;
+  }
+
+  if (username.length < 3) {
+    const pesan = "Username minimal 3 karakter.";
+    authMessage.innerText = pesan;
+    tampilkanPopup(pesan, "warning");
+    return;
+  }
+
+  if (credential.password === "") {
+    const pesan = "Password wajib diisi.";
+    authMessage.innerText = pesan;
+    tampilkanPopup(pesan, "warning");
+    return;
+  }
+
+  if (credential.password.length < 6) {
+    const pesan = "Password minimal 6 karakter.";
+    authMessage.innerText = pesan;
+    tampilkanPopup(pesan, "warning");
     return;
   }
 
   const { data, error } = await supabaseClient.auth.signUp({
-    email: email,
-    password: password
+    email: credential.email,
+    password: credential.password,
+    options: {
+      data: {
+        login_mode: "user",
+        username: username
+      }
+    }
   });
 
   if (error) {
-    authMessage.innerText = "Register gagal: " + error.message;
+    const pesan = "Register user gagal: " + error.message;
+    authMessage.innerText = pesan;
+    tampilkanPopup(pesan, "error");
     return;
   }
 
-  authMessage.innerText =
-    "Register berhasil. Jika Supabase meminta verifikasi, cek email kamu. Setelah itu login.";
+  if (data.user) {
+    await supabaseClient
+      .from("profiles")
+      .insert({
+        user_id: data.user.id,
+        username: username,
+        email: credential.email,
+        role: "user",
+        status: "active"
+      });
+  }
+
+  const pesan = "Register user berhasil. Silakan login menggunakan username dan password.";
+  authMessage.innerText = pesan;
+  tampilkanPopup(pesan, "success");
 }
 
 async function loginUser() {
-  const email = document.getElementById("emailInput").value.trim();
-  const password = document.getElementById("passwordInput").value.trim();
-  const authMessage = document.getElementById("authMessage");
+  setLoginLoading(true);
 
-  if (email === "" || password === "") {
-    authMessage.innerText = "Email dan password wajib diisi.";
-    return;
+  try {
+    const credential = ambilCredentialLogin();
+    const authMessage = document.getElementById("authMessage");
+
+    if (credential.email === "" || credential.password === "") {
+      const pesan = `${credential.tipe} dan password wajib diisi.`;
+      authMessage.innerText = pesan;
+      tampilkanPopup(pesan, "warning");
+      return;
+    }
+
+    if (modeLogin === "user") {
+      const username = document.getElementById("usernameInput").value.trim();
+
+      if (username === "") {
+        const pesan = "Username wajib diisi.";
+        authMessage.innerText = pesan;
+        tampilkanPopup(pesan, "warning");
+        return;
+      }
+    }
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+      email: credential.email,
+      password: credential.password
+    });
+
+    if (error) {
+      const pesan = "Login gagal. Email, username, atau password tidak sesuai.";
+      authMessage.innerText = pesan;
+      tampilkanPopup(pesan, "error");
+      return;
+    }
+
+    currentUser = data.user;
+
+    currentProfile = await ambilProfileUser();
+
+    if (!currentProfile) {
+      await supabaseClient.auth.signOut();
+      currentUser = null;
+
+      const pesan = "Akun ini belum memiliki profil. Hubungi admin.";
+      authMessage.innerText = pesan;
+      tampilkanPopup(pesan, "error");
+      return;
+    }
+
+    if (currentProfile.status !== "active") {
+      await supabaseClient.auth.signOut();
+      currentUser = null;
+
+      const pesan = "Akun ini sedang dinonaktifkan oleh admin.";
+      authMessage.innerText = pesan;
+      tampilkanPopup(pesan, "error");
+      return;
+    }
+
+    if (modeLogin === "admin" && currentProfile.role !== "admin") {
+      await supabaseClient.auth.signOut();
+      currentUser = null;
+
+      const pesan = "Login ditolak. Akun ini bukan admin.";
+      authMessage.innerText = pesan;
+      tampilkanPopup(pesan, "error");
+      return;
+    }
+
+    if (modeLogin === "user" && currentProfile.role !== "user") {
+      await supabaseClient.auth.signOut();
+      currentUser = null;
+
+      const pesan = "Login ditolak. Akun ini bukan user biasa.";
+      authMessage.innerText = pesan;
+      tampilkanPopup(pesan, "error");
+      return;
+    }
+
+    const pesan = "Login berhasil.";
+    authMessage.innerText = pesan;
+    tampilkanPopup(pesan, "success");
+
+    tampilkanModeLogin();
+
+    setTimeout(async function () {
+      await muatAplikasiSetelahLogin();
+    }, 100);
+
+  } finally {
+    setLoginLoading(false);
   }
-
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email: email,
-    password: password
-  });
-
-  if (error) {
-    authMessage.innerText = "Login gagal: " + error.message;
-    return;
-  }
-
-  currentUser = data.user;
-
-  authMessage.innerText = "Login berhasil.";
-
-  tampilkanModeLogin();
-  muatAplikasiSetelahLogin();
 }
 
 async function logoutUser() {
   const { error } = await supabaseClient.auth.signOut();
 
   if (error) {
-    alert("Logout gagal: " + error.message);
+    tampilkanPopup("Logout gagal: " + error.message);
     return;
   }
 
   currentUser = null;
+  currentProfile = null;
+  daftarProfiles = [];
   dataPengeluaran = [];
   targetBulanan = 0;
 
   tampilkanModeLogout();
+  tampilkanPopup("Logout berhasil.", "info");
+
 }
 
 async function cekSessionLogin() {
@@ -2218,6 +2785,17 @@ async function cekSessionLogin() {
 
   if (data.session && data.session.user) {
     currentUser = data.session.user;
+
+    currentProfile = await ambilProfileUser();
+
+    if (!currentProfile || currentProfile.status !== "active") {
+      await supabaseClient.auth.signOut();
+      currentUser = null;
+      currentProfile = null;
+      tampilkanModeLogout();
+      return;
+    }
+
     tampilkanModeLogin();
     muatAplikasiSetelahLogin();
   } else {
@@ -2230,8 +2808,278 @@ function tampilkanModeLogin() {
   document.getElementById("userSection").style.display = "block";
   document.getElementById("appSection").style.display = "block";
 
-  document.getElementById("userInfo").innerText =
-    "Login sebagai: " + currentUser.email;
+  if (currentProfile && currentProfile.role === "admin") {
+    document.getElementById("userInfo").innerText =
+      "Login sebagai Admin: " + currentUser.email;
+  } else if (currentProfile && currentProfile.username) {
+    document.getElementById("userInfo").innerText =
+      "Login sebagai User: " + currentProfile.username;
+  } else {
+    document.getElementById("userInfo").innerText =
+      "Login sebagai: " + currentUser.email;
+  }
+
+  const adminTabMenu = document.getElementById("adminTabMenu");
+  const adminUserControl = document.getElementById("adminUserControl");
+  const dashboardContent = document.getElementById("dashboardContent");
+
+  if (userSedangAdmin()) {
+    if (adminTabMenu) adminTabMenu.style.display = "grid";
+    if (dashboardContent) dashboardContent.style.display = "block";
+    if (adminUserControl) adminUserControl.style.display = "none";
+
+    bukaTabAdmin("dashboard");
+  } else {
+    if (adminTabMenu) adminTabMenu.style.display = "none";
+    if (dashboardContent) dashboardContent.style.display = "block";
+    if (adminUserControl) adminUserControl.style.display = "none";
+  }
+}
+
+async function muatDaftarUserAdmin() {
+  if (!userSedangAdmin()) {
+    return;
+  }
+
+  const tbody = document.getElementById("tabelKontrolUser");
+
+  if (!tbody) {
+    return;
+  }
+
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="6">Memuat daftar user...</td>
+    </tr>
+  `;
+
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6">Gagal memuat user: ${error.message}</td>
+      </tr>
+    `;
+    return;
+  }
+
+  daftarProfiles = data || [];
+
+  if (daftarProfiles.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6">Belum ada user.</td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = "";
+
+  daftarProfiles.forEach(function (profile) {
+    const tr = document.createElement("tr");
+
+    const statusClass = profile.status === "active" ? "active" : "disabled";
+    const statusText = profile.status === "active" ? "Aktif" : "Nonaktif";
+
+    let aksiHTML = "";
+
+    if (profile.role === "admin") {
+      aksiHTML = `<span class="info-text">Admin utama</span>`;
+    } else {
+      if (profile.status === "active") {
+        aksiHTML += `
+          <button class="btn-user-disable" onclick="ubahStatusUser('${profile.user_id}', 'disabled')">
+            Nonaktifkan
+          </button>
+        `;
+      } else {
+        aksiHTML += `
+          <button class="btn-user-enable" onclick="ubahStatusUser('${profile.user_id}', 'active')">
+            Aktifkan
+          </button>
+        `;
+      }
+
+      aksiHTML += `
+        <button class="btn-user-delete" onclick="hapusProfilUser('${profile.user_id}')">
+          Hapus
+        </button>
+      `;
+    }
+
+    tr.innerHTML = `
+      <td>${profile.username || "-"}</td>
+      <td>${profile.email || "-"}</td>
+      <td>${profile.role}</td>
+      <td>
+        <span class="user-status-badge ${statusClass}">
+          ${statusText}
+        </span>
+      </td>
+      <td>${formatTanggalIndonesia(profile.created_at)}</td>
+      <td>
+        <div class="user-action-row">
+          ${aksiHTML}
+        </div>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+async function tambahUserOlehAdmin() {
+  if (!userSedangAdmin()) {
+    tampilkanPopup("Akses ditolak. Hanya admin yang dapat menambah user.", "error");
+    return;
+  }
+
+  const usernameInput = document.getElementById("adminNewUsername");
+  const passwordInput = document.getElementById("adminNewPassword");
+
+  const username = usernameInput.value.trim();
+  const password = passwordInput.value.trim();
+
+  if (username === "") {
+    tampilkanPopup("Username user baru wajib diisi.", "warning");
+    return;
+  }
+
+  if (username.length < 3) {
+    tampilkanPopup("Username minimal 3 karakter.", "warning");
+    return;
+  }
+
+  if (password.length < 6) {
+    tampilkanPopup("Password minimal 6 karakter.", "warning");
+    return;
+  }
+
+  const emailUser = buatEmailUserDariUsername(username);
+
+  const tempClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false
+    }
+  });
+
+  const { data, error } = await tempClient.auth.signUp({
+    email: emailUser,
+    password: password,
+    options: {
+      data: {
+        login_mode: "user",
+        username: username
+      }
+    }
+  });
+
+  if (error) {
+    tampilkanPopup("Gagal membuat user: " + error.message, "error");
+    return;
+  }
+
+  if (!data.user) {
+    tampilkanPopup("User dibuat, tetapi data user belum tersedia. Pastikan email confirmation dimatikan.", "warning");
+    return;
+  }
+
+  const { error: profileError } = await supabaseClient
+    .from("profiles")
+    .insert({
+      user_id: data.user.id,
+      username: username,
+      email: emailUser,
+      role: "user",
+      status: "active"
+    });
+
+  if (profileError) {
+    tampilkanPopup("User Auth berhasil dibuat, tetapi profil gagal disimpan: " + profileError.message, "error");
+    return;
+  }
+
+  usernameInput.value = "";
+  passwordInput.value = "";
+
+  tampilkanPopup("User baru berhasil ditambahkan.", "success");
+
+  await muatDaftarUserAdmin();
+}
+
+async function ubahStatusUser(userId, statusBaru) {
+  if (!userSedangAdmin()) {
+    tampilkanPopup("Akses ditolak.", "error");
+    return;
+  }
+
+  const pesanKonfirmasi =
+    statusBaru === "disabled"
+      ? "User ini akan dinonaktifkan dan tidak bisa login. Lanjutkan?"
+      : "User ini akan diaktifkan kembali. Lanjutkan?";
+
+  const yakin = await tampilkanKonfirmasi(
+    pesanKonfirmasi,
+    "Ubah Status User"
+  );
+
+  if (!yakin) {
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("profiles")
+    .update({
+      status: statusBaru
+    })
+    .eq("user_id", userId)
+    .neq("role", "admin");
+
+  if (error) {
+    tampilkanPopup("Gagal mengubah status user: " + error.message, "error");
+    return;
+  }
+
+  tampilkanPopup("Status user berhasil diperbarui.", "success");
+
+  await muatDaftarUserAdmin();
+}
+
+async function hapusProfilUser(userId) {
+  if (!userSedangAdmin()) {
+    tampilkanPopup("Akses ditolak.", "error");
+    return;
+  }
+
+  const yakin = await tampilkanKonfirmasi(
+    "Profil user akan dihapus dari daftar kontrol. Akun Auth Supabase tidak terhapus. Lanjutkan?",
+    "Hapus Profil User"
+  );
+
+  if (!yakin) {
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("profiles")
+    .delete()
+    .eq("user_id", userId)
+    .neq("role", "admin");
+
+  if (error) {
+    tampilkanPopup("Gagal menghapus profil user: " + error.message, "error");
+    return;
+  }
+
+  tampilkanPopup("Profil user berhasil dihapus.", "success");
+
+  await muatDaftarUserAdmin();
 }
 
 function tampilkanModeLogout() {
@@ -2239,11 +3087,18 @@ function tampilkanModeLogout() {
   document.getElementById("userSection").style.display = "none";
   document.getElementById("appSection").style.display = "none";
 
+  currentProfile = null;
+  daftarProfiles = [];
+
   document.getElementById("userInfo").innerText = "Belum login.";
   document.getElementById("authMessage").innerText = "";
 
   document.getElementById("emailInput").value = "";
-  document.getElementById("passwordInput").value = "";
+  document.getElementById("adminPasswordInput").value = "";
+  document.getElementById("usernameInput").value = "";
+  document.getElementById("userPasswordInput").value = "";
+
+  pilihModeLogin("admin");
 }
 
 async function muatAplikasiSetelahLogin() {
@@ -2259,7 +3114,7 @@ function refreshTampilan() {
   hitungRingkasan();
   analisisPengeluaran();
   tampilkanSaranPintar();
-  tampilkanInsightItemSeringDibeli();
+  tampilkanInsightItemSering();
   tampilkanGrafikKategori();
 
   if (typeof tampilkanRingkasanKategori === "function") {
@@ -2281,7 +3136,7 @@ async function muatDataPengeluaranDariSupabase() {
     .order("tanggal", { ascending: false });
 
   if (error) {
-    alert("Gagal mengambil data pengeluaran: " + error.message);
+    tampilkanPopup("Gagal mengambil data pengeluaran: " + error.message);
     return;
   }
 
@@ -2309,7 +3164,7 @@ async function muatDataPengeluaranDariSupabase() {
 
 function exportPDF() {
   if (!currentUser) {
-    alert("Kamu harus login terlebih dahulu.");
+    tampilkanPopup("Kamu harus login terlebih dahulu.", "warning");
     return;
   }
 
@@ -2318,15 +3173,20 @@ function exportPDF() {
   });
 
   if (dataTerfilter.length === 0) {
-    alert("Tidak ada data pada bulan dan tahun yang dipilih.");
+    tampilkanPopup("Tidak ada data pada bulan dan tahun yang dipilih.", "warning");
     return;
   }
 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("p", "mm", "a4");
 
-  const namaPemilik = "Riski Hidayat Pasaribu";
+  const developerName = "Riski Hidayat Pasaribu";
   const namaAplikasi = "Smart Expense Tracker";
+
+  const namaPengguna =
+    currentProfile && currentProfile.username
+      ? currentProfile.username
+      : currentUser.email;
 
   const namaBulan = [
     "Januari", "Februari", "Maret", "April", "Mei", "Juni",
@@ -2362,30 +3222,86 @@ function exportPDF() {
     timeStyle: "short"
   });
 
+  const warnaUtama = [15, 23, 42];
+  const warnaAksen = [56, 189, 248];
+  const warnaAbu = [100, 116, 139];
+  const warnaBorder = [226, 232, 240];
+
   // =========================
   // Header PDF
   // =========================
+  doc.setFillColor(...warnaUtama);
+  doc.rect(0, 0, 210, 34, "F");
+
+  doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(18);
-  doc.text("Laporan Pengeluaran Bulanan", 14, 18);
+  doc.text("Laporan Pengeluaran Bulanan", 14, 15);
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
-  doc.text(namaAplikasi, 14, 25);
-  doc.text(`Pemilik Web: ${namaPemilik}`, 14, 31);
-  doc.text(`Akun: ${currentUser.email}`, 14, 37);
-  doc.text(`Periode: ${periode}`, 14, 43);
-  doc.text(`Tanggal Export: ${tanggalCetak}`, 14, 49);
+  doc.text(namaAplikasi, 14, 22);
 
-  doc.setLineWidth(0.3);
-  doc.line(14, 54, 196, 54);
+  doc.setDrawColor(...warnaAksen);
+  doc.setLineWidth(0.8);
+  doc.line(14, 28, 196, 28);
+
+  // =========================
+  // Informasi Laporan
+  // =========================
+  doc.setTextColor(15, 23, 42);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.text("Informasi Laporan", 14, 44);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(...warnaAbu);
+
+  const metadataRows = [
+    ["Aplikasi", namaAplikasi],
+    ["Pengguna", namaPengguna],
+    ["Akun", currentUser.email],
+    ["Periode", periode],
+    ["Tanggal Export", tanggalCetak]
+  ];
+
+  doc.autoTable({
+    startY: 49,
+    body: metadataRows,
+    theme: "plain",
+    styles: {
+      font: "helvetica",
+      fontSize: 10,
+      cellPadding: 1.8,
+      textColor: warnaAbu
+    },
+    columnStyles: {
+      0: {
+        cellWidth: 36,
+        fontStyle: "bold",
+        textColor: warnaUtama
+      },
+      1: {
+        cellWidth: 140,
+        textColor: warnaAbu
+      }
+    },
+    margin: {
+      left: 14,
+      right: 14
+    }
+  });
 
   // =========================
   // Ringkasan Utama
   // =========================
+  let yRingkasan = doc.lastAutoTable.finalY + 10;
+
+  doc.setTextColor(...warnaUtama);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(13);
-  doc.text("Ringkasan", 14, 64);
+  doc.setFontSize(12);
+  doc.text("Ringkasan", 14, yRingkasan);
 
   const ringkasanRows = [
     ["Total Pengeluaran", formatRupiah(totalBulan)],
@@ -2407,18 +3323,39 @@ function exportPDF() {
   }
 
   doc.autoTable({
-    startY: 68,
+    startY: yRingkasan + 5,
     head: [["Keterangan", "Nilai"]],
     body: ringkasanRows,
     theme: "grid",
     styles: {
       font: "helvetica",
       fontSize: 10,
-      cellPadding: 3
+      cellPadding: 3,
+      lineColor: warnaBorder,
+      lineWidth: 0.2
     },
     headStyles: {
-      fillColor: [15, 23, 42],
-      textColor: [255, 255, 255]
+      fillColor: warnaUtama,
+      textColor: [255, 255, 255],
+      fontStyle: "bold"
+    },
+    alternateRowStyles: {
+      fillColor: [248, 250, 252]
+    },
+    columnStyles: {
+      0: {
+        cellWidth: 70,
+        fontStyle: "bold",
+        textColor: warnaUtama
+      },
+      1: {
+        cellWidth: 110,
+        textColor: [30, 41, 59]
+      }
+    },
+    margin: {
+      left: 14,
+      right: 14
     }
   });
 
@@ -2427,36 +3364,53 @@ function exportPDF() {
   // =========================
   const kategoriRows = buatDataRingkasanKategoriPDF(dataTerfilter);
 
-  let ySetelahRingkasan = doc.lastAutoTable.finalY + 10;
+  let yKategori = doc.lastAutoTable.finalY + 10;
 
+  doc.setTextColor(...warnaUtama);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(13);
-  doc.text("Ringkasan Kategori", 14, ySetelahRingkasan);
+  doc.setFontSize(12);
+  doc.text("Ringkasan Kategori", 14, yKategori);
 
   doc.autoTable({
-    startY: ySetelahRingkasan + 4,
+    startY: yKategori + 5,
     head: [["Kategori", "Total", "Persentase"]],
     body: kategoriRows,
     theme: "grid",
     styles: {
       font: "helvetica",
       fontSize: 10,
-      cellPadding: 3
+      cellPadding: 3,
+      lineColor: warnaBorder,
+      lineWidth: 0.2
     },
     headStyles: {
-      fillColor: [14, 165, 233],
-      textColor: [0, 0, 0]
+      fillColor: warnaAksen,
+      textColor: [2, 6, 23],
+      fontStyle: "bold"
+    },
+    alternateRowStyles: {
+      fillColor: [248, 250, 252]
+    },
+    columnStyles: {
+      0: { cellWidth: 70 },
+      1: { cellWidth: 60, halign: "right" },
+      2: { cellWidth: 50, halign: "center" }
+    },
+    margin: {
+      left: 14,
+      right: 14
     }
   });
 
   // =========================
   // Detail Pengeluaran
   // =========================
-  let ySetelahKategori = doc.lastAutoTable.finalY + 10;
+  let yDetail = doc.lastAutoTable.finalY + 10;
 
+  doc.setTextColor(...warnaUtama);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(13);
-  doc.text("Detail Pengeluaran", 14, ySetelahKategori);
+  doc.setFontSize(12);
+  doc.text("Detail Pengeluaran", 14, yDetail);
 
   const dataUrut = [...dataTerfilter].sort(function (a, b) {
     return new Date(a.tanggal) - new Date(b.tanggal);
@@ -2475,31 +3429,41 @@ function exportPDF() {
   });
 
   doc.autoTable({
-    startY: ySetelahKategori + 4,
+    startY: yDetail + 5,
     head: [["No", "Tanggal", "Nama", "Kategori", "Harga Satuan", "Qty", "Total"]],
     body: detailRows,
     theme: "grid",
     styles: {
       font: "helvetica",
-      fontSize: 9,
-      cellPadding: 2.5
+      fontSize: 8.8,
+      cellPadding: 2.4,
+      lineColor: warnaBorder,
+      lineWidth: 0.2
     },
     headStyles: {
-      fillColor: [15, 23, 42],
-      textColor: [255, 255, 255]
+      fillColor: warnaUtama,
+      textColor: [255, 255, 255],
+      fontStyle: "bold"
+    },
+    alternateRowStyles: {
+      fillColor: [248, 250, 252]
     },
     columnStyles: {
-      0: { cellWidth: 10 },
+      0: { cellWidth: 10, halign: "center" },
       1: { cellWidth: 25 },
-      2: { cellWidth: 45 },
+      2: { cellWidth: 42 },
       3: { cellWidth: 28 },
       4: { cellWidth: 30, halign: "right" },
       5: { cellWidth: 15, halign: "center" },
       6: { cellWidth: 30, halign: "right" }
+    },
+    margin: {
+      left: 14,
+      right: 14
     }
   });
 
-  tambahFooterPDF(doc, namaPemilik);
+  tambahFooterPDF(doc, developerName);
 
   const namaFile = `laporan-pengeluaran-${filterTahun}-${String(filterBulan).padStart(2, "0")}.pdf`;
 
@@ -2553,29 +3517,29 @@ function formatTanggalIndonesia(tanggalString) {
   });
 }
 
-function tambahFooterPDF(doc, namaPemilik) {
+function tambahFooterPDF(doc, developerName) {
   const jumlahHalaman = doc.internal.getNumberOfPages();
 
   for (let i = 1; i <= jumlahHalaman; i++) {
     doc.setPage(i);
 
-    const tinggiHalaman = doc.internal.pageSize.height;
-    const lebarHalaman = doc.internal.pageSize.width;
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(0.2);
+    doc.line(14, 285, 196, 285);
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
+    doc.setTextColor(100, 116, 139);
 
     doc.text(
-      `${namaPemilik} - Pemilik Web`,
+      `Smart Expense Tracker | Developed by ${developerName}`,
       14,
-      tinggiHalaman - 10
+      290
     );
 
-    doc.text(
-      `Halaman ${i} dari ${jumlahHalaman}`,
-      lebarHalaman - 45,
-      tinggiHalaman - 10
-    );
+    doc.text(`Halaman ${i} dari ${jumlahHalaman}`, 196, 290, {
+      align: "right"
+    });
   }
 }
 
@@ -3175,4 +4139,71 @@ function buatSaranDariItemSering(item) {
   saran += `</p>`;
 
   return saran;
+}
+
+async function ambilAccessTokenSupabase() {
+  const { data, error } = await supabaseClient.auth.getSession();
+
+  if (error || !data.session) {
+    return null;
+  }
+
+  return data.session.access_token;
+}
+
+async function analisisPengeluaranDenganBackend(tanggal, nama, hargaSatuan, qty, kategori) {
+  try {
+    const accessToken = await ambilAccessTokenSupabase();
+
+    if (!accessToken) {
+      return {
+        success: false,
+        nama_final: nama,
+        kategori_final: kategori,
+        gabung: { gabung: false },
+        sumber: "fallback_no_token"
+      };
+    }
+
+    const response = await fetch(`${BACKEND_URL}/api/analyze-expense`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        access_token: accessToken,
+        tanggal: tanggal,
+        nama: nama,
+        harga_satuan: hargaSatuan,
+        qty: qty,
+        kategori: kategori
+      })
+    });
+
+    const hasil = await response.json();
+
+    if (!response.ok || !hasil.success) {
+      console.warn("Backend gagal menganalisis:", hasil);
+
+      return {
+        success: false,
+        nama_final: nama,
+        kategori_final: kategori,
+        gabung: { gabung: false },
+        sumber: "fallback_backend_error"
+      };
+    }
+
+    return hasil;
+  } catch (error) {
+    console.warn("Tidak bisa terhubung ke backend:", error);
+
+    return {
+      success: false,
+      nama_final: nama,
+      kategori_final: kategori,
+      gabung: { gabung: false },
+      sumber: "fallback_connection_error"
+    };
+  }
 }
