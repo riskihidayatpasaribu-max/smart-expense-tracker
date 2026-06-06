@@ -14,272 +14,392 @@
 
   <div class="container">
 
-    <section class="card" id="authSection">
-      <h2>Login / Register</h2>
+    <!-- =========================
+         LOGIN PAGE
+    ========================== -->
+    <section id="authSection" class="login-page">
+      <div class="login-overlay"></div>
 
-      <p class="info-text">
-        Masuk terlebih dahulu agar data pengeluaran tersimpan online.
-      </p>
-
-      <div class="form-group">
-        <label for="emailInput">Email</label>
-        <input type="email" id="emailInput" placeholder="Contoh: kamu@email.com" />
-      </div>
-
-      <div class="form-group">
-        <label for="passwordInput">Password</label>
-        <input type="password" id="passwordInput" placeholder="Minimal 6 karakter" />
-      </div>
-
-      <div class="auth-row">
-        <button onclick="registerUser()">Register</button>
-        <button onclick="loginUser()">Login</button>
-      </div>
-
-      <p id="authMessage" class="info-text"></p>
-    </section>
-
-    <section class="card" id="userSection" style="display: none;">
-      <h2>Akun Aktif</h2>
-
-      <p id="userInfo" class="info-text">Belum login.</p>
-
-      <button class="secondary-btn" onclick="logoutUser()">Logout</button>
-    </section>
-
-    <div id="appSection" style="display: none;">
-
-      <header>
-        <h1>Smart Expense Tracker</h1>
-        <p>Catatan pengeluaran harian dengan analisis sederhana.</p>
-      </header>
-
-      <section class="card">
-        <h2>Tambah Pengeluaran</h2>
-
-        <div class="form-group">
-          <label for="tanggal">Tanggal</label>
-          <input type="date" id="tanggal" />
+      <div class="login-card">
+        <div class="login-header">
+          <h1>Smart Expense Tracker</h1>
+          <p>Kelola pengeluaran dengan tampilan modern dan data tersimpan online.</p>
         </div>
 
-        <div class="form-group">
-          <label for="nama">Nama Pengeluaran</label>
-          <input type="text" id="nama" placeholder="Contoh: Nasi goreng" />
+        <div class="login-mode-box">
+          <button type="button" id="btnModeAdmin" class="mode-btn active" onclick="pilihModeLogin('admin')">
+            Admin
+          </button>
+
+          <button type="button" id="btnModeUser" class="mode-btn" onclick="pilihModeLogin('user')">
+            User Biasa
+          </button>
         </div>
 
-        <div class="form-group">
-          <label for="hargaSatuan">Harga Satuan</label>
-          <input type="number" id="hargaSatuan" placeholder="Contoh: 5000" />
-        </div>
-
-        <div class="form-group">
-          <label for="qty">Jumlah Item</label>
-          <input type="number" id="qty" placeholder="Contoh: 2" min="1" value="1" />
-        </div>
-
-        <div class="form-group">
-          <label for="kategori">Kategori</label>
-          <select id="kategori">
-            <option value="Makanan">Makanan</option>
-            <option value="Transportasi">Transportasi</option>
-            <option value="Internet">Internet</option>
-            <option value="Belanja">Belanja</option>
-            <option value="Pendidikan">Pendidikan</option>
-            <option value="Kesehatan">Kesehatan</option>
-            <option value="Hiburan">Hiburan</option>
-            <option value="Tagihan">Tagihan</option>
-            <option value="Lainnya">Lainnya</option>
-          </select>
-        </div>
-
-        <button id="btnSimpan" onclick="simpanPengeluaran()">Tambah Data</button>
-        <button id="btnBatalEdit" class="secondary-btn" onclick="batalEdit()" style="display: none;">
-          Batal Edit
-        </button>
-      </section>
-
-      <section class="card">
-        <h2>Target Pengeluaran Bulanan</h2>
-
-        <div class="form-group">
-          <label for="targetBulanan">Batas Pengeluaran Bulanan</label>
-          <input type="number" id="targetBulanan" placeholder="Contoh: 1500000" />
-        </div>
-
-        <button onclick="simpanTargetBulanan()">Simpan Target</button>
-
-        <p id="targetInfo" class="info-text">Belum ada target bulanan.</p>
-      </section>
-
-      <section class="card">
-        <h2>Filter Data</h2>
-
-        <div class="filter-row">
+        <div id="adminLoginBox" class="login-form-box">
           <div class="form-group">
-            <label for="filterBulan">Bulan</label>
-            <select id="filterBulan">
-              <option value="1">Januari</option>
-              <option value="2">Februari</option>
-              <option value="3">Maret</option>
-              <option value="4">April</option>
-              <option value="5">Mei</option>
-              <option value="6">Juni</option>
-              <option value="7">Juli</option>
-              <option value="8">Agustus</option>
-              <option value="9">September</option>
-              <option value="10">Oktober</option>
-              <option value="11">November</option>
-              <option value="12">Desember</option>
-            </select>
+            <label for="emailInput">Email Admin</label>
+            <input type="email" id="emailInput" placeholder="Masukkan email admin" />
           </div>
 
           <div class="form-group">
-            <label for="filterTahun">Tahun</label>
-            <input type="number" id="filterTahun" placeholder="Contoh: 2026" />
+            <label for="adminPasswordInput">Password Admin</label>
+            <input type="password" id="adminPasswordInput" placeholder="Masukkan password admin" />
           </div>
         </div>
 
-        <button onclick="terapkanFilter()">Terapkan Filter</button>
+        <div id="userLoginBox" class="login-form-box" style="display: none;">
+          <div class="form-group">
+            <label for="usernameInput">Username</label>
+            <input type="text" id="usernameInput" placeholder="Masukkan username" />
+          </div>
 
-        <p id="filterInfo" class="info-text">Menampilkan data bulan ini.</p>
-      </section>
+          <div class="form-group">
+            <label for="userPasswordInput">Password</label>
+            <input type="password" id="userPasswordInput" placeholder="Masukkan password" />
+          </div>
+        </div>
 
-      <section class="card">
-        <h2>Laporan PDF</h2>
+        <div class="auth-row login-action-row">
+          <button id="btnRegister" onclick="registerUser()">Register User</button>
+          <button id="btnLogin" onclick="loginUser()">Login Admin</button>
+        </div>
 
-        <p class="info-text">
-          Export laporan pengeluaran berdasarkan bulan dan tahun yang sedang difilter.
+        <p id="loginReminder" class="login-reminder">
+          Mohon ingat username dan password Anda karena web ini tidak menyediakan fitur lupa password.
         </p>
 
-        <button onclick="exportPDF()">Export ke PDF</button>
-      </section>
+        <p id="authMessage" class="login-message"></p>
+      </div>
+    </section>
 
-      <section class="summary">
-        <div class="summary-card">
-          <h3>Total Hari Ini</h3>
-          <p id="totalHariIni">Rp0</p>
+    <!-- =========================
+         USER BAR
+    ========================== -->
+    <section id="userSection" class="top-user-bar" style="display: none;">
+      <div>
+        <p class="top-label">Status Akun</p>
+        <h3 id="userInfo">Belum login.</h3>
+      </div>
+
+      <button onclick="logoutUser()" class="logout-btn">Logout</button>
+    </section>
+
+    <!-- =========================
+         DASHBOARD PAGE
+    ========================== -->
+    <div id="appSection" class="dashboard-page" style="display: none;">
+      <div class="dashboard-bg"></div>
+
+      <div class="dashboard-container">
+
+        <div class="admin-tab-menu" id="adminTabMenu" style="display: none;">
+          <button type="button" id="btnTabDashboard" class="admin-tab-btn active" onclick="bukaTabAdmin('dashboard')">
+            Dashboard Pengeluaran
+          </button>
+
+          <button type="button" id="btnTabUser" class="admin-tab-btn" onclick="bukaTabAdmin('user')">
+            Kontrol User
+          </button>
         </div>
 
-        <div class="summary-card">
-          <h3>Total Bulan Ini</h3>
-          <p id="totalBulanIni">Rp0</p>
+        <div id="dashboardContent">
+
+          <section class="card">
+            <h2>Tambah Pengeluaran</h2>
+
+            <div class="form-group">
+              <label for="tanggal">Tanggal</label>
+              <input type="date" id="tanggal" />
+            </div>
+
+            <div class="form-group">
+              <label for="nama">Nama Pengeluaran</label>
+              <input type="text" id="nama" placeholder="Contoh: Nasi goreng" />
+            </div>
+
+            <div class="form-group">
+              <label for="hargaSatuan">Harga Satuan</label>
+              <input type="number" id="hargaSatuan" placeholder="Contoh: 5000" />
+            </div>
+
+            <div class="form-group">
+              <label for="qty">Jumlah Item</label>
+              <input type="number" id="qty" placeholder="Contoh: 2" min="1" value="1" />
+            </div>
+
+            <div class="form-group">
+              <label for="kategori">Kategori</label>
+              <select id="kategori">
+                <option value="Makanan">Makanan</option>
+                <option value="Transportasi">Transportasi</option>
+                <option value="Internet">Internet</option>
+                <option value="Belanja">Belanja</option>
+                <option value="Pendidikan">Pendidikan</option>
+                <option value="Kesehatan">Kesehatan</option>
+                <option value="Hiburan">Hiburan</option>
+                <option value="Tagihan">Tagihan</option>
+                <option value="Utang/Bon">Utang/Bon</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
+            </div>
+
+            <button id="btnSimpan" onclick="simpanPengeluaran()">Tambah Data</button>
+
+            <button id="btnBatalEdit" class="secondary-btn" onclick="batalEdit()" style="display: none;">
+              Batal Edit
+            </button>
+          </section>
+
+          <section class="card">
+            <h2>Target Pengeluaran Bulanan</h2>
+
+            <div class="form-group">
+              <label for="targetBulanan">Batas Pengeluaran Bulanan</label>
+              <input type="number" id="targetBulanan" placeholder="Contoh: 1500000" />
+            </div>
+
+            <button onclick="simpanTargetBulanan()">Simpan Target</button>
+
+            <p id="targetInfo" class="info-text">Belum ada target bulanan.</p>
+          </section>
+
+          <section class="card">
+            <h2>Filter Data</h2>
+
+            <div class="filter-row">
+              <div class="form-group">
+                <label for="filterBulan">Bulan</label>
+                <select id="filterBulan">
+                  <option value="1">Januari</option>
+                  <option value="2">Februari</option>
+                  <option value="3">Maret</option>
+                  <option value="4">April</option>
+                  <option value="5">Mei</option>
+                  <option value="6">Juni</option>
+                  <option value="7">Juli</option>
+                  <option value="8">Agustus</option>
+                  <option value="9">September</option>
+                  <option value="10">Oktober</option>
+                  <option value="11">November</option>
+                  <option value="12">Desember</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="filterTahun">Tahun</label>
+                <input type="number" id="filterTahun" placeholder="Contoh: 2026" />
+              </div>
+            </div>
+
+            <button onclick="terapkanFilter()">Terapkan Filter</button>
+
+            <p id="filterInfo" class="info-text">Menampilkan data bulan ini.</p>
+          </section>
+
+          <section class="card">
+            <h2>Laporan PDF</h2>
+
+            <p class="info-text">
+              Export laporan pengeluaran berdasarkan bulan dan tahun yang sedang difilter.
+            </p>
+
+            <button onclick="exportPDF()">Export ke PDF</button>
+          </section>
+
+          <section class="summary">
+            <div class="summary-card">
+              <h3>Total Hari Ini</h3>
+              <p id="totalHariIni">Rp0</p>
+            </div>
+
+            <div class="summary-card">
+              <h3>Total Bulan Ini</h3>
+              <p id="totalBulanIni">Rp0</p>
+            </div>
+
+            <div class="summary-card">
+              <h3>Prediksi Akhir Bulan</h3>
+              <p id="prediksiBulan">Rp0</p>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2>Analisis Pengeluaran</h2>
+            <p id="analisisText">Belum ada data untuk dianalisis.</p>
+          </section>
+
+          <section class="card smart-card">
+            <h2>Saran Pintar</h2>
+            <p id="saranPintarText">Belum ada data untuk membuat saran.</p>
+          </section>
+
+          <section class="card smart-card">
+            <h2>Insight Item Sering Dibeli</h2>
+            <div id="insightItemText">Belum ada data item untuk dianalisis.</div>
+          </section>
+
+          <section class="card">
+            <h2>Grafik Pengeluaran per Kategori</h2>
+            <div class="chart-box">
+              <canvas id="grafikKategori"></canvas>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2>Ringkasan Kategori</h2>
+
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Kategori</th>
+                    <th>Total</th>
+                    <th>Persentase</th>
+                  </tr>
+                </thead>
+
+                <tbody id="tabelRingkasanKategori">
+                  <!-- Ringkasan kategori muncul di sini -->
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2>Grafik Pengeluaran Harian</h2>
+            <div class="chart-box">
+              <canvas id="grafikHarian"></canvas>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2>Daftar Pengeluaran</h2>
+
+            <div class="table-filter">
+              <div class="form-group">
+                <label for="searchInput">Cari Pengeluaran</label>
+                <input type="text" id="searchInput" placeholder="Contoh: kopi, bensin, rinso"
+                  oninput="tampilkanData()" />
+              </div>
+
+              <div class="form-group">
+                <label for="filterKategori">Filter Kategori</label>
+                <select id="filterKategori" onchange="tampilkanData()">
+                  <option value="Semua">Semua Kategori</option>
+                  <option value="Makanan">Makanan</option>
+                  <option value="Transportasi">Transportasi</option>
+                  <option value="Internet">Internet</option>
+                  <option value="Belanja">Belanja</option>
+                  <option value="Pendidikan">Pendidikan</option>
+                  <option value="Kesehatan">Kesehatan</option>
+                  <option value="Hiburan">Hiburan</option>
+                  <option value="Tagihan">Tagihan</option>
+                  <option value="Utang/Bon">Utang/Bon</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="sortData">Urutkan Data</label>
+                <select id="sortData" onchange="tampilkanData()">
+                  <option value="terbaru">Tanggal Terbaru</option>
+                  <option value="terlama">Tanggal Terlama</option>
+                  <option value="terbesar">Jumlah Terbesar</option>
+                  <option value="terkecil">Jumlah Terkecil</option>
+                  <option value="nama_az">Nama A-Z</option>
+                  <option value="nama_za">Nama Z-A</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Tanggal</th>
+                    <th>Nama</th>
+                    <th>Kategori</th>
+                    <th>Harga Satuan</th>
+                    <th>Qty</th>
+                    <th>Total</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+
+                <tbody id="tabelPengeluaran">
+                  <!-- Data akan muncul di sini -->
+                </tbody>
+              </table>
+            </div>
+          </section>
+
         </div>
 
-        <div class="summary-card">
-          <h3>Prediksi Akhir Bulan</h3>
-          <p id="prediksiBulan">Rp0</p>
-        </div>
-      </section>
-
-      <section class="card">
-        <h2>Analisis Pengeluaran</h2>
-        <p id="analisisText">Belum ada data untuk dianalisis.</p>
-      </section>
-
-      <section class="card smart-card">
-        <h2>Saran Pintar</h2>
-        <p id="saranPintarText">Belum ada data untuk membuat saran.</p>
-      </section>
-
-      <section class="card smart-card">
-        <h2>Insight Item Sering Dibeli</h2>
-        <div id="insightItemText">Belum ada data item untuk dianalisis.</div>
-      </section>
-
-      <section class="card">
-        <h2>Grafik Pengeluaran per Kategori</h2>
-        <div class="chart-box">
-          <canvas id="grafikKategori"></canvas>
-        </div>
-      </section>
-
-      <section class="card">
-        <h2>Ringkasan Kategori</h2>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Kategori</th>
-              <th>Total</th>
-              <th>Persentase</th>
-            </tr>
-          </thead>
-
-          <tbody id="tabelRingkasanKategori">
-            <!-- Ringkasan kategori muncul di sini -->
-          </tbody>
-        </table>
-      </section>
-
-      <section class="card">
-        <h2>Grafik Pengeluaran Harian</h2>
-        <div class="chart-box">
-          <canvas id="grafikHarian"></canvas>
-        </div>
-      </section>
-
-      <section class="card">
-        <h2>Daftar Pengeluaran</h2>
-
-        <div class="table-filter">
-          <div class="form-group">
-            <label for="searchInput">Cari Pengeluaran</label>
-            <input type="text" id="searchInput" placeholder="Contoh: kopi, bensin, rinso" oninput="tampilkanData()" />
+        <div class="dashboard-hero">
+          <div>
+            <p class="hero-kicker">Personal Finance Dashboard</p>
+            <h1>Smart Expense Tracker</h1>
+            <p>
+              Pantau pengeluaran harian, target bulanan, kategori belanja, dan ringkasan keuangan dalam satu tampilan.
+            </p>
           </div>
 
-          <div class="form-group">
-            <label for="filterKategori">Filter Kategori</label>
-            <select id="filterKategori" onchange="tampilkanData()">
-              <option value="Semua">Semua Kategori</option>
-              <option value="Makanan">Makanan</option>
-              <option value="Transportasi">Transportasi</option>
-              <option value="Internet">Internet</option>
-              <option value="Belanja">Belanja</option>
-              <option value="Pendidikan">Pendidikan</option>
-              <option value="Kesehatan">Kesehatan</option>
-              <option value="Hiburan">Hiburan</option>
-              <option value="Tagihan">Tagihan</option>
-              <option value="Lainnya">Lainnya</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="sortData">Urutkan Data</label>
-            <select id="sortData" onchange="tampilkanData()">
-              <option value="terbaru">Tanggal Terbaru</option>
-              <option value="terlama">Tanggal Terlama</option>
-              <option value="terbesar">Jumlah Terbesar</option>
-              <option value="terkecil">Jumlah Terkecil</option>
-              <option value="nama_az">Nama A-Z</option>
-              <option value="nama_za">Nama Z-A</option>
-            </select>
-          </div>
         </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Tanggal</th>
-              <th>Nama</th>
-              <th>Kategori</th>
-              <th>Harga Satuan</th>
-              <th>Qty</th>
-              <th>Total</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
+        <section class="card admin-only" id="adminUserControl" style="display: none;">
+          <h2>Kontrol User</h2>
 
-          <tbody id="tabelPengeluaran">
-            <!-- Data akan muncul di sini -->
-          </tbody>
-        </table>
-      </section>
+          <p class="info-text">
+            Menu ini hanya tampil untuk admin. Admin dapat menambahkan user baru, melihat daftar user, dan mengatur
+            status akun.
+          </p>
 
+          <div class="admin-user-form">
+            <div class="form-group">
+              <label for="adminNewUsername">Username User Baru</label>
+              <input type="text" id="adminNewUsername" placeholder="Contoh: user1" />
+            </div>
+
+            <div class="form-group">
+              <label for="adminNewPassword">Password User Baru</label>
+              <input type="password" id="adminNewPassword" placeholder="Minimal 6 karakter" />
+            </div>
+
+            <button onclick="tambahUserOlehAdmin()">Tambah User</button>
+          </div>
+
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Email Internal</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Dibuat</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+
+              <tbody id="tabelKontrolUser">
+                <tr>
+                  <td colspan="6">Belum ada data user.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+
+      </div>
     </div>
 
   </div>
 
-
+  <!-- =========================
+       LIBRARY
+  ========================== -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -288,6 +408,32 @@
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="script.js"></script>
+
+  <!-- =========================
+       TOAST POPUP
+  ========================== -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- =========================
+       CONFIRM MODAL
+  ========================== -->
+  <div id="confirmModal" class="confirm-modal">
+    <div class="confirm-box">
+      <h3 id="confirmTitle">Konfirmasi</h3>
+      <p id="confirmMessage">Apakah kamu yakin?</p>
+
+      <div class="confirm-actions">
+        <button type="button" id="confirmCancelBtn" class="confirm-cancel">
+          Batal
+        </button>
+
+        <button type="button" id="confirmOkBtn" class="confirm-ok">
+          Lanjutkan
+        </button>
+      </div>
+    </div>
+  </div>
+
 </body>
 
 </html>
