@@ -23,15 +23,15 @@
       <div class="login-card">
         <div class="login-header">
           <h1>Smart Expense Tracker</h1>
-          <p>Aplikasi pintar berbasis web untuk mencatat dan menghitung pengeluaran harian.</p>
+          <p>Kelola pengeluaran dengan tampilan modern dan data tersimpan online.</p>
         </div>
 
         <div class="login-mode-box">
-          <button type="button" id="btnModeAdmin" class="mode-btn active" onclick="pilihModeLogin('admin')">
+          <button type="button" id="btnModeAdmin" class="active" onclick="pilihModeLogin('admin')">
             Admin
           </button>
 
-          <button type="button" id="btnModeUser" class="mode-btn" onclick="pilihModeLogin('user')">
+          <button type="button" id="btnModeUser" onclick="pilihModeLogin('user')">
             User Biasa
           </button>
         </div>
@@ -61,11 +61,13 @@
         </div>
 
         <div class="auth-row login-action-row">
-          <button id="btnRegister" onclick="registerUser()">Register User</button>
-          <button id="btnLogin" onclick="loginUser()">Login Admin</button>
+          <button id="btnRegister" type="button" onclick="registerUser()" style="display: none;">
+            Register User
+          </button>
+          <button id="btnLogin" type="button" onclick="loginUser()">Login Admin</button>
         </div>
 
-        <p id="loginReminder" class="login-reminder">
+        <p id="loginReminder" class="login-reminder" style="display: none;">
           Mohon ingat username dan password Anda karena web ini tidak menyediakan fitur lupa password.
         </p>
 
@@ -145,6 +147,13 @@
             </div>
 
             <button id="btnSimpan" onclick="simpanPengeluaran()">Tambah Data</button>
+
+            <div id="aiInfoBox" class="ai-info-box" style="display: none;">
+              <div class="ai-info-title">Keterangan Deteksi</div>
+              <div id="aiInfoText" class="ai-info-text">
+                Belum ada keterangan.
+              </div>
+            </div>
 
             <button id="btnBatalEdit" class="secondary-btn" onclick="batalEdit()" style="display: none;">
               Batal Edit
@@ -231,7 +240,14 @@
 
           <section class="card smart-card">
             <h2>Saran Pintar</h2>
-            <p id="saranPintarText">Belum ada data untuk membuat saran.</p>
+
+            <p id="saranPintarText">
+              Klik tombol di bawah untuk membuat saran pintar berdasarkan data pengeluaran bulan ini.
+            </p>
+
+            <button type="button" id="btnSaranPintar" onclick="buatSaranPintarAI()">
+              Buat Saran Pintar
+            </button>
           </section>
 
           <section class="card smart-card">
