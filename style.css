@@ -1,3 +1,7 @@
+/* ================================
+   GLOBAL
+================================ */
+
 * {
   box-sizing: border-box;
   font-family: Arial, sans-serif;
@@ -119,14 +123,16 @@ textarea:focus {
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: 430px;
-  padding: 34px 32px;
-  border-radius: 24px;
-  background: rgba(15, 23, 42, 0.72);
-  border: 1px solid rgba(148, 163, 184, 0.22);
+  max-width: 460px;
+  padding: 34px 34px 30px;
+  border-radius: 28px;
+  background: rgba(10, 20, 40, 0.34);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow:
-    0 30px 80px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    0 18px 40px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(6px);
 }
 
@@ -153,34 +159,37 @@ textarea:focus {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin-bottom: 22px;
-  padding: 5px;
+  margin: 22px 0 24px;
+  padding: 6px;
   border-radius: 18px;
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(15, 23, 42, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .mode-btn {
+  -webkit-appearance: none;
+  appearance: none;
   border: none;
+  outline: none;
+  min-height: 48px;
   border-radius: 14px;
-  padding: 12px 14px;
   background: transparent;
-  color: #cbd5e1;
-  font-weight: 600;
+  color: #dbe4f0;
+  font-size: 16px;
+  font-weight: 700;
   cursor: pointer;
   transition: 0.25s ease;
 }
 
 .mode-btn:hover {
-  background: rgba(148, 163, 184, 0.12);
-  color: #f8fafc;
-  transform: none;
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
 }
 
 .mode-btn.active {
   background: linear-gradient(135deg, #38bdf8, #7c3aed);
   color: #ffffff;
-  box-shadow: 0 12px 28px rgba(56, 189, 248, 0.22);
+  box-shadow: 0 10px 25px rgba(56, 189, 248, 0.22);
 }
 
 .login-form-box .form-group {
@@ -920,7 +929,7 @@ tbody tr:hover {
   justify-content: flex-start;
 }
 
-.dashboard-hero > div:first-child {
+.dashboard-hero>div:first-child {
   max-width: 800px;
 }
 
@@ -1081,4 +1090,503 @@ button:disabled {
 #btnLogin:disabled {
   background: linear-gradient(135deg, #64748b, #475569) !important;
   box-shadow: none !important;
+}
+
+.ai-info-box {
+  margin-top: 16px;
+  padding: 15px 16px;
+  border-radius: 16px;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  color: #dbeafe;
+}
+
+.ai-info-title {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #7dd3fc;
+  margin-bottom: 6px;
+}
+
+.ai-info-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #e5e7eb;
+}
+
+.expense-row-even {
+  background: rgba(15, 23, 42, 0.72);
+}
+
+.expense-row-odd {
+  background: rgba(30, 41, 59, 0.52);
+}
+
+.expense-row:hover {
+  background: rgba(56, 189, 248, 0.13);
+}
+
+.date-separator-row td {
+  padding: 18px 14px 8px !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.date-separator-row span {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  color: #7dd3fc;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: #f8fafc;
+  font-family: Arial, sans-serif;
+  background: #081120;
+}
+
+.container {
+  min-height: 100vh;
+}
+
+/* LOGIN PAGE */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 18px;
+  background:
+    linear-gradient(rgba(4, 13, 32, 0.58), rgba(4, 13, 32, 0.68)),
+    url("assets/bg-login.jpg") center/cover no-repeat;
+}
+
+/* DASHBOARD PAGE */
+.dashboard-page {
+  min-height: 100vh;
+  padding: 28px 18px 42px;
+  background:
+    linear-gradient(rgba(4, 13, 32, 0.72), rgba(4, 13, 32, 0.78)),
+    url("assets/bg-dashboard.jpg") center/cover fixed no-repeat;
+}
+
+/* =====================================================
+   FINAL OVERRIDE - BACKGROUND IMAGE + GLASS UI FIX
+   Tempel blok ini di PALING BAWAH style.css.
+   Pastikan file gambar tersedia:
+   assets/bg-login.jpg
+   assets/bg-dashboard.jpg
+===================================================== */
+
+:root {
+  --glass-dark: rgba(10, 20, 40, 0.38);
+  --glass-card: rgba(15, 23, 42, 0.58);
+  --glass-border: rgba(255, 255, 255, 0.13);
+  --accent-blue: #38bdf8;
+  --accent-purple: #7c3aed;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+  background: #020617 !important;
+  color: #f8fafc;
+}
+
+.container {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* ================= LOGIN BACKGROUND IMAGE ================= */
+#authSection.login-page,
+.login-page {
+  position: relative !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  min-height: 100vh !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  display: block !important;
+  background:
+    linear-gradient(rgba(3, 7, 18, 0.52), rgba(3, 7, 18, 0.66)),
+    url("assets/bg-login.jpg") center center / cover no-repeat !important;
+}
+
+.login-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(56, 189, 248, 0.18), transparent 28%),
+    radial-gradient(circle at 86% 76%, rgba(124, 58, 237, 0.22), transparent 34%);
+  filter: none !important;
+  width: auto !important;
+  height: auto !important;
+  border-radius: 0 !important;
+  z-index: 1;
+}
+
+.login-page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 46px 46px;
+  width: auto !important;
+  height: auto !important;
+  border-radius: 0 !important;
+  filter: none !important;
+  z-index: 1;
+}
+
+.login-overlay {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1 !important;
+  background: rgba(2, 6, 23, 0.16) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* ================= LOGIN GLASS CARD ================= */
+.login-card {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  z-index: 5 !important;
+  width: min(460px, calc(100% - 40px)) !important;
+  margin: 0 !important;
+  transform: translate(-50%, -50%) !important;
+  padding: 34px 34px 30px !important;
+  border-radius: 28px !important;
+  background: rgba(9, 18, 36, 0.36) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow:
+    0 22px 60px rgba(0, 0, 0, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09) !important;
+  backdrop-filter: blur(22px) saturate(145%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(145%) !important;
+}
+
+.login-header h1 {
+  color: #f8fafc !important;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.22);
+}
+
+.login-header p {
+  color: rgba(226, 232, 240, 0.88) !important;
+}
+
+/* ================= FIX TOMBOL ADMIN / USER ================= */
+.login-mode-box {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 12px !important;
+  margin: 22px 0 24px !important;
+  padding: 6px !important;
+  border-radius: 18px !important;
+  background: rgba(2, 6, 23, 0.36) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.login-mode-box button,
+.login-mode-box .mode-btn,
+#btnModeAdmin,
+#btnModeUser {
+  width: 100% !important;
+  min-height: 48px !important;
+  padding: 12px !important;
+  border-radius: 14px !important;
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  color: #dbe4f0 !important;
+  box-shadow: none !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  transition: 0.25s ease !important;
+  transform: none !important;
+}
+
+.login-mode-box button:hover,
+.login-mode-box .mode-btn:hover,
+#btnModeAdmin:hover,
+#btnModeUser:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.login-mode-box button.active,
+.login-mode-box .mode-btn.active,
+#btnModeAdmin.active,
+#btnModeUser.active {
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)) !important;
+  color: #ffffff !important;
+  box-shadow: 0 12px 28px rgba(56, 189, 248, 0.22) !important;
+}
+
+/* ================= LOGIN INPUT + ACTION BUTTON ================= */
+.login-card input,
+.login-card select,
+.login-card textarea {
+  background: rgba(2, 6, 23, 0.62) !important;
+  border: 1px solid rgba(255, 255, 255, 0.11) !important;
+  color: #f8fafc !important;
+}
+
+.login-card input::placeholder {
+  color: rgba(226, 232, 240, 0.42) !important;
+}
+
+.login-card input:focus,
+.login-card select:focus {
+  border-color: rgba(56, 189, 248, 0.58) !important;
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.13) !important;
+}
+
+.login-action-row {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 12px !important;
+}
+
+#btnLogin {
+  min-height: 50px !important;
+  background: linear-gradient(135deg, #38bdf8, #7c3aed) !important;
+  color: #ffffff !important;
+  box-shadow: 0 16px 34px rgba(56, 189, 248, 0.22) !important;
+}
+
+#btnRegister {
+  min-height: 50px !important;
+  background: rgba(226, 232, 240, 0.14) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+/* ================= DASHBOARD BACKGROUND IMAGE ================= */
+#appSection.dashboard-page,
+.dashboard-page {
+  position: relative !important;
+  min-height: 100vh !important;
+  padding: 28px 18px 42px !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  background:
+    linear-gradient(rgba(2, 6, 23, 0.72), rgba(2, 6, 23, 0.84)),
+    url("assets/bg-dashboard.jpg") center center / cover fixed no-repeat !important;
+}
+
+.dashboard-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(56, 189, 248, 0.12), transparent 30%),
+    radial-gradient(circle at 85% 75%, rgba(124, 58, 237, 0.16), transparent 34%);
+  width: auto !important;
+  height: auto !important;
+  border-radius: 0 !important;
+  filter: none !important;
+}
+
+.dashboard-page::after,
+.dashboard-bg {
+  content: "";
+  position: fixed !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+  opacity: 1 !important;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px) !important;
+  background-size: 46px 46px !important;
+  width: auto !important;
+  height: auto !important;
+  border-radius: 0 !important;
+  filter: none !important;
+}
+
+.dashboard-container,
+.top-user-bar {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+/* ================= DASHBOARD GLASS CARDS ================= */
+.dashboard-hero,
+.top-user-bar,
+.card,
+.summary-card,
+.chart-box,
+.admin-tab-menu,
+.ai-info-box {
+  background: rgba(9, 18, 36, 0.56) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: blur(14px) saturate(135%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(135%) !important;
+}
+
+.card,
+.summary-card,
+.chart-box {
+  border-radius: 22px !important;
+}
+
+/* ================= TABLE ROW COLOR + DATE GAP FIX ================= */
+table {
+  border-collapse: separate !important;
+  border-spacing: 0 8px !important;
+}
+
+.expense-row-even {
+  background: rgba(15, 23, 42, 0.78) !important;
+}
+
+.expense-row-odd {
+  background: rgba(30, 41, 59, 0.62) !important;
+}
+
+.expense-row:hover {
+  background: rgba(56, 189, 248, 0.15) !important;
+}
+
+.date-separator-row td {
+  padding: 20px 14px 8px !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.date-separator-row span {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 7px 12px !important;
+  border-radius: 999px !important;
+  background: rgba(56, 189, 248, 0.12) !important;
+  border: 1px solid rgba(56, 189, 248, 0.28) !important;
+  color: #7dd3fc !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.04em !important;
+}
+
+/* ================= MOBILE OPTIMIZATION ================= */
+@media (max-width: 768px) {
+  #authSection.login-page,
+  .login-page {
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+  }
+
+  .login-card {
+    width: min(430px, calc(100% - 30px)) !important;
+    padding: 28px 22px !important;
+    border-radius: 22px !important;
+    backdrop-filter: blur(18px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(140%) !important;
+  }
+
+  .login-header h1 {
+    font-size: 24px !important;
+  }
+
+  .login-header p {
+    font-size: 13px !important;
+  }
+
+  #appSection.dashboard-page,
+  .dashboard-page {
+    background-attachment: scroll !important;
+    padding: 18px !important;
+  }
+}
+
+/* ================================
+   FORCE PAGE VISIBILITY
+================================ */
+
+.force-hidden {
+  display: none !important;
+}
+
+/* Login card lebih transparan / glass */
+.login-card {
+  background: rgba(10, 20, 40, 0.18) !important;
+  backdrop-filter: blur(24px) saturate(145%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(145%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10) !important;
+}
+
+/* Input login ikut lebih kaca */
+.login-card input {
+  background: rgba(2, 6, 23, 0.38) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #f8fafc !important;
+}
+
+/* Tombol mode login tetap rapi */
+.login-mode-box button,
+.mode-btn,
+#btnModeAdmin,
+#btnModeUser {
+  background: transparent !important;
+  color: #e5e7eb !important;
+}
+
+.login-mode-box button.active,
+.mode-btn.active,
+#btnModeAdmin.active,
+#btnModeUser.active {
+  background: linear-gradient(135deg, #38bdf8, #7c3aed) !important;
+  color: #ffffff !important;
+  box-shadow: 0 14px 30px rgba(56, 189, 248, 0.24) !important;
+}
+
+.force-hidden {
+  display: none !important;
+}
+
+
+#btnSaranPintar {
+  margin-top: 14px;
+  background: linear-gradient(135deg, #38bdf8, #7c3aed);
+  color: #ffffff;
+  box-shadow: 0 14px 30px rgba(56, 189, 248, 0.18);
+}
+
+#btnSaranPintar:hover {
+  box-shadow: 0 18px 36px rgba(124, 58, 237, 0.26);
+}
+
+#btnSaranPintar:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #64748b, #475569);
+  box-shadow: none;
 }
