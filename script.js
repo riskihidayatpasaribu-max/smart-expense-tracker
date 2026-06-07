@@ -15,8 +15,9 @@ let modeLogin = "admin";
 let currentProfile = null;
 let daftarProfiles = [];
 
-const BACKEND_URL = "";
+let cacheSaranPintarAI = {};
 
+const BACKEND_URL = "https://wbditvqcdynxppquzqig.supabase.co/functions/v1";
 
 
 document.addEventListener("DOMContentLoaded", async function () {
@@ -182,6 +183,8 @@ function bukaTabAdmin(tab) {
   }
 }
 
+
+
 function tampilkanPopup(pesan, tipe = "info", judul = "") {
   const container = document.getElementById("toastContainer");
 
@@ -221,6 +224,24 @@ function tampilkanPopup(pesan, tipe = "info", judul = "") {
       toast.remove();
     }, 250);
   }, 3500);
+}
+
+function tampilkanKeteranganAI(teks) {
+  const box = document.getElementById("aiInfoBox");
+  const text = document.getElementById("aiInfoText");
+
+  if (!box || !text) {
+    return;
+  }
+
+  if (!teks || teks.trim() === "") {
+    box.style.display = "none";
+    text.innerText = "";
+    return;
+  }
+
+  text.innerText = teks;
+  box.style.display = "block";
 }
 
 function tampilkanKonfirmasi(pesan, judul = "Konfirmasi") {
@@ -384,8 +405,10 @@ async function tambahPengeluaran() {
   const hasilDeteksiHarga = deteksiHargaTidakWajar(namaInput, hargaSatuan);
 
   if (hasilDeteksiHarga.tidakWajar) {
-    const lanjutSimpan = tampilkanKonfirmasi(hasilDeteksiHarga.pesan);
-
+    const lanjutSimpan = await tampilkanKonfirmasi(
+      hasilDeteksiHarga.pesan,
+      "Harga Tidak Wajar"
+    );
     if (!lanjutSimpan) {
       return;
     }
@@ -394,8 +417,10 @@ async function tambahPengeluaran() {
   const hasilDeteksiHarian = deteksiTotalHarianTidakWajar(tanggal, totalBaru);
 
   if (hasilDeteksiHarian.tidakWajar) {
-    const lanjutSimpanHarian = tampilkanKonfirmasi(hasilDeteksiHarian.pesan);
-
+    const lanjutSimpanHarian = await tampilkanKonfirmasi(
+      hasilDeteksiHarian.pesan,
+      "Total Harian Tidak Wajar"
+    );
     if (!lanjutSimpanHarian) {
       return;
     }
@@ -409,6 +434,21 @@ async function tambahPengeluaran() {
     kategori
   );
 
+  if (hasilBackend && hasilBackend.alasan) {
+    if (hasilBackend.nama_final && hasilBackend.nama_final !== namaInput) {
+      tampilkanKeteranganAI(
+        `Sistem mendeteksi kemungkinan typo "${namaInput}" dan merapikannya menjadi "${hasilBackend.nama_final}". ` +
+        `Kategori yang dipilih: ${hasilBackend.kategori_final}. ` +
+        `${hasilBackend.alasan}`
+      );
+    } else {
+      tampilkanKeteranganAI(
+        `Sistem menganalisis "${namaInput}" sebagai kategori ${hasilBackend.kategori_final}. ` +
+        `${hasilBackend.alasan}`
+      );
+    }
+  }
+
   const namaFinal = hasilBackend.nama_final || namaInput;
   const kategoriFinal = hasilBackend.kategori_final || kategori;
   const hasilGabung = hasilBackend.gabung || { gabung: false };
@@ -420,14 +460,15 @@ async function tambahPengeluaran() {
     const qtyGabungan = qtyLama + qty;
     const totalGabungan = jumlahLama + totalBaru;
 
-    const lanjut = tampilkanKonfirmasi(
+    const lanjut = await tampilkanKonfirmasi(
       `Item mirip ditemukan pada tanggal yang sama:\n\n` +
       `"${namaInput}" akan digabung ke "${hasilGabung.nama_lama}".\n\n` +
       `Qty lama: ${qtyLama}\n` +
       `Qty tambahan: ${qty}\n` +
       `Qty baru: ${qtyGabungan}\n\n` +
       `Total baru: ${formatRupiah(totalGabungan)}\n\n` +
-      `Lanjut gabungkan data?`
+      `Lanjut gabungkan data?`,
+      "Gabungkan Item"
     );
 
     if (!lanjut) {
@@ -450,6 +491,13 @@ async function tambahPengeluaran() {
       tampilkanPopup("Gagal menggabungkan data: " + error.message);
       return;
     }
+
+    tampilkanKeteranganAI(
+      `Sistem mendeteksi "${namaInput}" sebagai variasi atau typo dari "${hasilGabung.nama_lama}". ` +
+      `Data digabung sehingga jumlah item dan total pengeluaran diperbarui.`
+    );
+
+
   } else {
     const { error } = await supabaseClient.from("expenses").insert({
       user_id: currentUser.id,
@@ -635,25 +683,45 @@ function tampilkanData() {
     return 0;
   });
 
-  dataTerfilter.forEach(function (item) {
+  let tanggalSebelumnya = "";
+
+  dataTerfilter.forEach(function (item, index) {
+    if (item.tanggal !== tanggalSebelumnya) {
+      const rowTanggal = document.createElement("tr");
+      rowTanggal.className = "date-separator-row";
+
+      rowTanggal.innerHTML = `
+      <td colspan="7">
+        <span>${formatTanggalIndonesia(item.tanggal)}</span>
+      </td>
+    `;
+
+      tabel.appendChild(rowTanggal);
+      tanggalSebelumnya = item.tanggal;
+    }
+
     const row = document.createElement("tr");
+
+    row.className = index % 2 === 0
+      ? "expense-row expense-row-even"
+      : "expense-row expense-row-odd";
 
     const hargaSatuan = Math.round(Number(item.harga_satuan) || 0);
     const qty = Math.round(Number(item.qty) || 1);
     const total = hargaSatuan * qty;
 
     row.innerHTML = `
-      <td>${item.tanggal}</td>
-      <td>${item.nama}</td>
-      <td>${item.kategori}</td>
-      <td>${formatRupiah(hargaSatuan)}</td>
-      <td>x${qty}</td>
-      <td>${formatRupiah(total)}</td>
-      <td>
-        <button class="edit-btn" onclick="editData('${item.id}')">Edit</button>
-        <button class="delete-btn" onclick="hapusData('${item.id}')">Hapus</button>
-      </td>
-    `;
+    <td>${item.tanggal}</td>
+    <td>${item.nama}</td>
+    <td>${item.kategori}</td>
+    <td>${formatRupiah(hargaSatuan)}</td>
+    <td>x${qty}</td>
+    <td>${formatRupiah(total)}</td>
+    <td>
+      <button class="edit-btn" onclick="editData('${item.id}')">Edit</button>
+      <button class="delete-btn" onclick="hapusData('${item.id}')">Hapus</button>
+    </td>
+  `;
 
     tabel.appendChild(row);
   });
@@ -2807,19 +2875,35 @@ async function cekSessionLogin() {
 }
 
 function tampilkanModeLogin() {
-  document.getElementById("authSection").style.display = "none";
-  document.getElementById("userSection").style.display = "block";
-  document.getElementById("appSection").style.display = "block";
+  const authSection = document.getElementById("authSection");
+  const userSection = document.getElementById("userSection");
+  const appSection = document.getElementById("appSection");
 
-  if (currentProfile && currentProfile.role === "admin") {
-    document.getElementById("userInfo").innerText =
-      "Login sebagai Admin: " + currentUser.email;
-  } else if (currentProfile && currentProfile.username) {
-    document.getElementById("userInfo").innerText =
-      "Login sebagai User: " + currentProfile.username;
-  } else {
-    document.getElementById("userInfo").innerText =
-      "Login sebagai: " + currentUser.email;
+  if (authSection) {
+    authSection.style.setProperty("display", "none", "important");
+    authSection.classList.add("force-hidden");
+  }
+
+  if (userSection) {
+    userSection.style.setProperty("display", "block", "important");
+    userSection.classList.remove("force-hidden");
+  }
+
+  if (appSection) {
+    appSection.style.setProperty("display", "block", "important");
+    appSection.classList.remove("force-hidden");
+  }
+
+  const userInfo = document.getElementById("userInfo");
+
+  if (userInfo) {
+    if (currentProfile && currentProfile.role === "admin") {
+      userInfo.innerText = "Login sebagai Admin: " + currentUser.email;
+    } else if (currentProfile && currentProfile.username) {
+      userInfo.innerText = "Login sebagai User: " + currentProfile.username;
+    } else if (currentUser) {
+      userInfo.innerText = "Login sebagai: " + currentUser.email;
+    }
   }
 
   const adminTabMenu = document.getElementById("adminTabMenu");
@@ -2827,16 +2911,18 @@ function tampilkanModeLogin() {
   const dashboardContent = document.getElementById("dashboardContent");
 
   if (userSedangAdmin()) {
-    if (adminTabMenu) adminTabMenu.style.display = "grid";
-    if (dashboardContent) dashboardContent.style.display = "block";
-    if (adminUserControl) adminUserControl.style.display = "none";
+    if (adminTabMenu) adminTabMenu.style.setProperty("display", "grid", "important");
+    if (dashboardContent) dashboardContent.style.setProperty("display", "block", "important");
+    if (adminUserControl) adminUserControl.style.setProperty("display", "none", "important");
 
     bukaTabAdmin("dashboard");
   } else {
-    if (adminTabMenu) adminTabMenu.style.display = "none";
-    if (dashboardContent) dashboardContent.style.display = "block";
-    if (adminUserControl) adminUserControl.style.display = "none";
+    if (adminTabMenu) adminTabMenu.style.setProperty("display", "none", "important");
+    if (dashboardContent) dashboardContent.style.setProperty("display", "block", "important");
+    if (adminUserControl) adminUserControl.style.setProperty("display", "none", "important");
   }
+
+  window.scrollTo(0, 0);
 }
 
 async function muatDaftarUserAdmin() {
@@ -3086,20 +3172,43 @@ async function hapusProfilUser(userId) {
 }
 
 function tampilkanModeLogout() {
-  document.getElementById("authSection").style.display = "block";
-  document.getElementById("userSection").style.display = "none";
-  document.getElementById("appSection").style.display = "none";
+  const authSection = document.getElementById("authSection");
+  const userSection = document.getElementById("userSection");
+  const appSection = document.getElementById("appSection");
+
+  if (authSection) {
+    authSection.style.setProperty("display", "block", "important");
+    authSection.classList.remove("force-hidden");
+  }
+
+  if (userSection) {
+    userSection.style.setProperty("display", "none", "important");
+    userSection.classList.add("force-hidden");
+  }
+
+  if (appSection) {
+    appSection.style.setProperty("display", "none", "important");
+    appSection.classList.add("force-hidden");
+  }
 
   currentProfile = null;
   daftarProfiles = [];
 
-  document.getElementById("userInfo").innerText = "Belum login.";
-  document.getElementById("authMessage").innerText = "";
+  const userInfo = document.getElementById("userInfo");
+  const authMessage = document.getElementById("authMessage");
 
-  document.getElementById("emailInput").value = "";
-  document.getElementById("adminPasswordInput").value = "";
-  document.getElementById("usernameInput").value = "";
-  document.getElementById("userPasswordInput").value = "";
+  if (userInfo) userInfo.innerText = "Belum login.";
+  if (authMessage) authMessage.innerText = "";
+
+  const emailInput = document.getElementById("emailInput");
+  const adminPasswordInput = document.getElementById("adminPasswordInput");
+  const usernameInput = document.getElementById("usernameInput");
+  const userPasswordInput = document.getElementById("userPasswordInput");
+
+  if (emailInput) emailInput.value = "";
+  if (adminPasswordInput) adminPasswordInput.value = "";
+  if (usernameInput) usernameInput.value = "";
+  if (userPasswordInput) userPasswordInput.value = "";
 
   pilihModeLogin("admin");
 }
@@ -3116,7 +3225,7 @@ function refreshTampilan() {
   tampilkanData();
   hitungRingkasan();
   analisisPengeluaran();
-  tampilkanSaranPintar();
+  tampilkanSaranPintarAwal();
   tampilkanInsightItemSering();
   tampilkanGrafikKategori();
 
@@ -3647,7 +3756,7 @@ function deteksiKategoriDariRiwayat(namaInput) {
   return deteksiKategoriOtomatis(namaInput);
 }
 
-function tampilkanSaranPintar() {
+function tampilkanSaranPintarLokal() {
   const saranText = document.getElementById("saranPintarText");
 
   if (!saranText) {
@@ -3762,6 +3871,101 @@ function tampilkanSaranPintar() {
   }
 
   saranText.innerText = saran;
+}
+
+async function buatSaranPintarAI() {
+  const saranText = document.getElementById("saranPintarText");
+  const btnSaran = document.getElementById("btnSaranPintar");
+
+  if (!saranText) {
+    return;
+  }
+
+  const dataTerfilter = dataPengeluaran.filter(function (item) {
+    return cekDataSesuaiFilter(item);
+  });
+
+  if (dataTerfilter.length === 0) {
+    saranText.innerText =
+      "Belum ada data pada bulan dan tahun yang dipilih. Tambahkan data terlebih dahulu.";
+    return;
+  }
+
+  if (!BACKEND_URL) {
+    tampilkanSaranPintarLokal();
+    return;
+  }
+
+  const totalData = dataTerfilter.reduce(function (total, item) {
+    return total + (Number(item.jumlah) || 0);
+  }, 0);
+
+  const cacheKey =
+    `${filterBulan}-${filterTahun}-${dataTerfilter.length}-${totalData}-${targetBulanan}`;
+
+  if (cacheSaranPintarAI[cacheKey]) {
+    saranText.innerText = cacheSaranPintarAI[cacheKey];
+    return;
+  }
+
+  if (btnSaran) {
+    btnSaran.disabled = true;
+    btnSaran.innerText = "Membuat Saran...";
+  }
+
+  saranText.innerText =
+    "Sedang menganalisis pola pengeluaran dan membuat saran pintar...";
+
+  try {
+    const namaBulan = [
+      "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+      "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
+
+    const periode = `${namaBulan[filterBulan - 1]} ${filterTahun}`;
+
+    const dataUntukAI = dataTerfilter.map(function (item) {
+      return {
+        tanggal: item.tanggal,
+        nama: item.nama,
+        kategori: item.kategori,
+        qty: item.qty,
+        jumlah: item.jumlah
+      };
+    });
+
+    const response = await fetch(`${BACKEND_URL}/smart-suggestion`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        periode: periode,
+        target_bulanan: targetBulanan,
+        data_pengeluaran: dataUntukAI
+      })
+    });
+
+    const hasil = await response.json();
+
+    if (!response.ok || !hasil.success || !hasil.saran) {
+      tampilkanSaranPintarLokal();
+      return;
+    }
+
+    cacheSaranPintarAI[cacheKey] = hasil.saran;
+    saranText.innerText = hasil.saran;
+
+  } catch (error) {
+    console.warn("Gagal mengambil saran pintar:", error);
+    tampilkanSaranPintarLokal();
+
+  } finally {
+    if (btnSaran) {
+      btnSaran.disabled = false;
+      btnSaran.innerText = "Buat Saran Pintar";
+    }
+  }
 }
 
 function cariKategoriTerbesarDariObject(totalKategori) {
@@ -4050,6 +4254,27 @@ function hitungPrediksiPintarAkhirBulan() {
   };
 }
 
+function tampilkanSaranPintarAwal() {
+  const saranText = document.getElementById("saranPintarText");
+
+  if (!saranText) {
+    return;
+  }
+
+  const dataTerfilter = dataPengeluaran.filter(function (item) {
+    return cekDataSesuaiFilter(item);
+  });
+
+  if (dataTerfilter.length === 0) {
+    saranText.innerText =
+      "Belum ada data pada bulan dan tahun yang dipilih. Tambahkan data terlebih dahulu untuk membuat saran pintar.";
+    return;
+  }
+
+  saranText.innerText =
+    "Data pengeluaran sudah siap dianalisis. Klik tombol Buat Saran Pintar untuk mendapatkan saran berdasarkan pola pengeluaran bulan ini.";
+}
+
 function tampilkanInsightItemSering() {
   const container = document.getElementById("insightItemText");
 
@@ -4155,20 +4380,30 @@ async function ambilAccessTokenSupabase() {
 }
 
 async function analisisPengeluaranDenganBackend(tanggal, nama, hargaSatuan, qty, kategori) {
+  if (!BACKEND_URL) {
+    return {
+      success: false,
+      nama_final: rapikanNamaPengeluaran(nama),
+      kategori_final: deteksiKategoriDariRiwayat(nama),
+      gabung: { gabung: false },
+      sumber: "fallback_frontend"
+    };
+  }
+
   try {
     const accessToken = await ambilAccessTokenSupabase();
 
     if (!accessToken) {
       return {
         success: false,
-        nama_final: nama,
-        kategori_final: kategori,
+        nama_final: rapikanNamaPengeluaran(nama),
+        kategori_final: deteksiKategoriDariRiwayat(nama),
         gabung: { gabung: false },
         sumber: "fallback_no_token"
       };
     }
 
-    const response = await fetch(`${BACKEND_URL}/api/analyze-expense`, {
+    const response = await fetch(`${BACKEND_URL}/analyze-expense`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -4190,8 +4425,8 @@ async function analisisPengeluaranDenganBackend(tanggal, nama, hargaSatuan, qty,
 
       return {
         success: false,
-        nama_final: nama,
-        kategori_final: kategori,
+        nama_final: rapikanNamaPengeluaran(nama),
+        kategori_final: deteksiKategoriDariRiwayat(nama),
         gabung: { gabung: false },
         sumber: "fallback_backend_error"
       };
@@ -4203,8 +4438,8 @@ async function analisisPengeluaranDenganBackend(tanggal, nama, hargaSatuan, qty,
 
     return {
       success: false,
-      nama_final: nama,
-      kategori_final: kategori,
+      nama_final: rapikanNamaPengeluaran(nama),
+      kategori_final: deteksiKategoriDariRiwayat(nama),
       gabung: { gabung: false },
       sumber: "fallback_connection_error"
     };
