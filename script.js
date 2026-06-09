@@ -126,19 +126,23 @@ async function cekAksesSetelahLogin() {
 function togglePassword(inputId, button) {
   const input = document.getElementById(inputId);
 
-  if (!input) {
-    return;
-  }
+  if (!input) return;
 
-  if (input.type === "password") {
-    input.type = "text";
+  const sedangTersembunyi = input.getAttribute("type") === "password";
+
+  if (sedangTersembunyi) {
+    input.setAttribute("type", "text");
     button.innerText = "🙈";
     button.classList.add("password-visible");
+    button.setAttribute("aria-label", "Sembunyikan password");
   } else {
-    input.type = "password";
+    input.setAttribute("type", "password");
     button.innerText = "👁";
     button.classList.remove("password-visible");
+    button.setAttribute("aria-label", "Tampilkan password");
   }
+
+  input.focus();
 }
 
 function setLoginLoading(isLoading) {
