@@ -7,7 +7,7 @@
 
   <title>Smart Expense Tracker</title>
 
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=9" />
 </head>
 
 <body>
@@ -46,7 +46,8 @@
             <label for="adminPasswordInput">Password Admin</label>
             <div class="password-wrapper">
               <input type="password" id="adminPasswordInput" placeholder="Masukkan password admin" />
-              <button type="button" class="eye-btn" onclick="togglePassword('adminPasswordInput', this)">
+              <button type="button" class="eye-btn" onclick="togglePassword('adminPasswordInput', this)"
+                aria-label="Tampilkan password">
                 👁
               </button>
             </div>
@@ -63,7 +64,8 @@
             <label for="userPasswordInput">Password</label>
             <div class="password-wrapper">
               <input type="password" id="userPasswordInput" placeholder="Masukkan password user" />
-              <button type="button" class="eye-btn" onclick="togglePassword('userPasswordInput', this)">
+              <button type="button" class="eye-btn" onclick="togglePassword('userPasswordInput', this)"
+                aria-label="Tampilkan password">
                 👁
               </button>
             </div>
@@ -433,7 +435,7 @@
 
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="script.js"></script>
+  <script src="script.js?v=9"></script>
 
   <!-- =========================
        TOAST POPUP
