@@ -123,6 +123,24 @@ async function cekAksesSetelahLogin() {
   return true;
 }
 
+function togglePassword(inputId, button) {
+  const input = document.getElementById(inputId);
+
+  if (!input) {
+    return;
+  }
+
+  if (input.type === "password") {
+    input.type = "text";
+    button.innerText = "🙈";
+    button.classList.add("password-visible");
+  } else {
+    input.type = "password";
+    button.innerText = "👁";
+    button.classList.remove("password-visible");
+  }
+}
+
 function setLoginLoading(isLoading) {
   const btnLogin = document.getElementById("btnLogin");
   const btnRegister = document.getElementById("btnRegister");
@@ -183,6 +201,16 @@ function bukaTabAdmin(tab) {
   }
 }
 
+
+function refreshTampilan() {
+  hitungRingkasan();
+  analisisPengeluaran();
+  tampilkanGrafikKategori();
+  tampilkanRingkasanKategori();
+  tampilkanGrafikHarian();
+  tampilkanSaranPintarAwal();
+  tampilkanInsightItem();
+}
 
 
 function tampilkanPopup(pesan, tipe = "info", judul = "") {
@@ -518,6 +546,7 @@ async function tambahPengeluaran() {
   kosongkanForm();
 
   await muatDataPengeluaranDariSupabase();
+  cacheSaranPintarAI = {};
   refreshTampilan();
 }
 
@@ -602,6 +631,7 @@ async function updatePengeluaran() {
   kosongkanForm();
 
   await muatDataPengeluaranDariSupabase();
+  cacheSaranPintarAI = {};
   refreshTampilan();
 
   tampilkanPopup("Data berhasil diperbarui.");
@@ -770,6 +800,7 @@ async function hapusData(id) {
   }
 
   await muatDataPengeluaranDariSupabase();
+  cacheSaranPintarAI = {};
   refreshTampilan();
 }
 
@@ -3948,12 +3979,17 @@ async function buatSaranPintarAI() {
 
     const hasil = await response.json();
 
+    console.log("Hasil Saran Pintar:", hasil);
+
     if (!response.ok || !hasil.success || !hasil.saran) {
       tampilkanSaranPintarLokal();
       return;
     }
 
-    cacheSaranPintarAI[cacheKey] = hasil.saran;
+    if (hasil.source === "ai") {
+      cacheSaranPintarAI[cacheKey] = hasil.saran;
+    }
+
     saranText.innerText = hasil.saran;
 
   } catch (error) {
