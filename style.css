@@ -1590,3 +1590,48 @@ table {
   background: linear-gradient(135deg, #64748b, #475569);
   box-shadow: none;
 }
+
+/* ================================
+   PASSWORD EYE BUTTON
+================================ */
+
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-wrapper input {
+  padding-right: 52px !important;
+}
+
+.eye-btn {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  width: 38px;
+  height: 38px;
+  min-height: 38px;
+  padding: 0;
+  transform: translateY(-50%);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #e5e7eb !important;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.eye-btn:hover {
+  transform: translateY(-50%) !important;
+  background: rgba(56, 189, 248, 0.16) !important;
+  color: #ffffff !important;
+}
+
+.eye-btn.password-visible {
+  background: rgba(56, 189, 248, 0.24) !important;
+  border-color: rgba(56, 189, 248, 0.42);
+}
