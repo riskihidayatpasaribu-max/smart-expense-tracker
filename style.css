@@ -1592,46 +1592,126 @@ table {
 }
 
 /* ================================
-   PASSWORD EYE BUTTON
+   PASSWORD EYE BUTTON - FIXED
+   Tidak ikut efek hover global button
 ================================ */
 
 .password-wrapper {
-  position: relative;
-  width: 100%;
+  position: relative !important;
+  width: 100% !important;
+  display: block !important;
 }
 
 .password-wrapper input {
-  padding-right: 52px !important;
+  width: 100% !important;
+  padding-right: 56px !important;
 }
 
-.eye-btn {
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  width: 38px;
-  height: 38px;
-  min-height: 38px;
-  padding: 0;
-  transform: translateY(-50%);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.08) !important;
-  color: #e5e7eb !important;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: none !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  line-height: 1;
-}
+/* Selector dibuat lebih spesifik agar menang dari style button global */
+.password-wrapper .eye-btn,
+.login-card .password-wrapper .eye-btn,
+button.eye-btn {
+  position: absolute !important;
+  top: 50% !important;
+  right: 12px !important;
+  left: auto !important;
+  bottom: auto !important;
 
-.eye-btn:hover {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  max-width: 38px !important;
+  max-height: 38px !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
   transform: translateY(-50%) !important;
-  background: rgba(56, 189, 248, 0.16) !important;
+  translate: none !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  z-index: 30 !important;
+  border-radius: 12px !important;
+
+  background: rgba(255, 255, 255, 0.10) !important;
+  color: #e5e7eb !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow: none !important;
+
+  font-size: 16px !important;
+  line-height: 1 !important;
+  text-align: center !important;
+
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease !important;
+}
+
+/* Hover tidak boleh mengubah posisi */
+.password-wrapper .eye-btn:hover,
+.login-card .password-wrapper .eye-btn:hover,
+button.eye-btn:hover {
+  transform: translateY(-50%) !important;
+  translate: none !important;
+  background: rgba(56, 189, 248, 0.18) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+/* Saat diklik juga tetap di tempat */
+.password-wrapper .eye-btn:active,
+.login-card .password-wrapper .eye-btn:active,
+button.eye-btn:active {
+  transform: translateY(-50%) !important;
+  translate: none !important;
+  background: rgba(56, 189, 248, 0.24) !important;
+  box-shadow: none !important;
+}
+
+.password-wrapper .eye-btn:focus,
+.login-card .password-wrapper .eye-btn:focus,
+button.eye-btn:focus {
+  outline: none !important;
+  transform: translateY(-50%) !important;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.16) !important;
+}
+
+.password-wrapper .eye-btn.password-visible,
+.login-card .password-wrapper .eye-btn.password-visible,
+button.eye-btn.password-visible {
+  transform: translateY(-50%) !important;
+  translate: none !important;
+  background: rgba(56, 189, 248, 0.26) !important;
+  border-color: rgba(56, 189, 248, 0.50) !important;
   color: #ffffff !important;
 }
 
-.eye-btn.password-visible {
-  background: rgba(56, 189, 248, 0.24) !important;
-  border-color: rgba(56, 189, 248, 0.42);
+/* Mobile: area sentuh tetap nyaman dan tidak bergeser */
+@media (max-width: 768px) {
+  .password-wrapper .eye-btn,
+  .login-card .password-wrapper .eye-btn,
+  button.eye-btn {
+    right: 10px !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    transform: translateY(-50%) !important;
+  }
+
+  .password-wrapper input {
+    padding-right: 58px !important;
+  }
 }
