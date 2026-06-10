@@ -1840,3 +1840,130 @@ button.eye-btn.password-visible {
     font-size: 13px;
   }
 }
+
+/* ================================
+   ABOUT, DEMO, AI HISTORY, PROJECT INFO
+================================ */
+
+.demo-login-btn {
+  margin-top: 12px !important;
+  min-height: 48px !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow: none !important;
+}
+
+.demo-login-btn:hover {
+  background: rgba(56, 189, 248, 0.18) !important;
+  transform: none !important;
+}
+
+.about-app-card p {
+  line-height: 1.8;
+  color: #dbe4f0;
+}
+
+.about-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.about-feature-grid div {
+  padding: 15px;
+  border-radius: 16px;
+  background: rgba(2, 6, 23, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.about-feature-grid strong {
+  display: block;
+  color: #7dd3fc;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.about-feature-grid span {
+  color: #cbd5e1;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.project-info-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.project-info-grid div {
+  padding: 15px;
+  border-radius: 16px;
+  background: rgba(2, 6, 23, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.project-info-grid span {
+  display: block;
+  color: #94a3b8;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.project-info-grid strong {
+  color: #f8fafc;
+  font-size: 14px;
+}
+
+.project-stack {
+  margin-top: 16px;
+  padding: 13px 14px;
+  border-radius: 14px;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  color: #cbd5e1 !important;
+  line-height: 1.7;
+}
+
+#riwayatAiSection table {
+  min-width: 900px;
+}
+
+.ai-history-badge {
+  display: inline-flex;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.24);
+  color: #7dd3fc;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.demo-mode-badge {
+  display: inline-flex;
+  margin-left: 8px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(245, 158, 11, 0.13);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  color: #fcd34d;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+@media (max-width: 900px) {
+  .about-feature-grid,
+  .project-info-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .about-feature-grid,
+  .project-info-grid {
+    grid-template-columns: 1fr;
+  }
+}

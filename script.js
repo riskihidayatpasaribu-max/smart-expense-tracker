@@ -16,6 +16,8 @@ let currentProfile = null;
 let daftarProfiles = [];
 
 let cacheSaranPintarAI = {};
+let modeDemoPortfolio = false;
+let riwayatDeteksiAI = [];
 
 const BACKEND_URL = "https://wbditvqcdynxppquzqig.supabase.co/functions/v1";
 
@@ -202,6 +204,193 @@ function setLoginLoading(isLoading) {
   }
 }
 
+function buatDataDemoPortfolio() {
+  const tahun = new Date().getFullYear();
+  const bulan = String(new Date().getMonth() + 1).padStart(2, "0");
+
+  return [
+    {
+      id: "demo-1",
+      user_id: "demo-user",
+      tanggal: `${tahun}-${bulan}-02`,
+      nama: "Nasi goreng",
+      kategori: "Makanan",
+      harga_satuan: 18000,
+      qty: 2,
+      jumlah: 36000
+    },
+    {
+      id: "demo-2",
+      user_id: "demo-user",
+      tanggal: `${tahun}-${bulan}-04`,
+      nama: "Bensin motor",
+      kategori: "Transportasi",
+      harga_satuan: 35000,
+      qty: 1,
+      jumlah: 35000
+    },
+    {
+      id: "demo-3",
+      user_id: "demo-user",
+      tanggal: `${tahun}-${bulan}-07`,
+      nama: "Paket internet",
+      kategori: "Internet",
+      harga_satuan: 75000,
+      qty: 1,
+      jumlah: 75000
+    },
+    {
+      id: "demo-4",
+      user_id: "demo-user",
+      tanggal: `${tahun}-${bulan}-10`,
+      nama: "Sabun dan rinso",
+      kategori: "Belanja",
+      harga_satuan: 42000,
+      qty: 1,
+      jumlah: 42000
+    },
+    {
+      id: "demo-5",
+      user_id: "demo-user",
+      tanggal: `${tahun}-${bulan}-14`,
+      nama: "Buku catatan",
+      kategori: "Pendidikan",
+      harga_satuan: 25000,
+      qty: 2,
+      jumlah: 50000
+    },
+    {
+      id: "demo-6",
+      user_id: "demo-user",
+      tanggal: `${tahun}-${bulan}-17`,
+      nama: "Obat flu",
+      kategori: "Kesehatan",
+      harga_satuan: 30000,
+      qty: 1,
+      jumlah: 30000
+    },
+    {
+      id: "demo-7",
+      user_id: "demo-user",
+      tanggal: `${tahun}-${bulan}-21`,
+      nama: "Kopi susu",
+      kategori: "Makanan",
+      harga_satuan: 18000,
+      qty: 3,
+      jumlah: 54000
+    }
+  ];
+}
+
+function buatRiwayatDemoAI() {
+  return [
+    {
+      waktu: new Date().toLocaleString("id-ID"),
+      input: "estih",
+      hasil: "es teh",
+      kategori: "Makanan",
+      keterangan: "Sistem mendeteksi kemungkinan typo dan merapikan nama pengeluaran."
+    },
+    {
+      waktu: new Date().toLocaleString("id-ID"),
+      input: "bensn",
+      hasil: "bensin",
+      kategori: "Transportasi",
+      keterangan: "Sistem menyesuaikan kategori berdasarkan pola nama pengeluaran."
+    },
+    {
+      waktu: new Date().toLocaleString("id-ID"),
+      input: "paket data",
+      hasil: "paket internet",
+      kategori: "Internet",
+      keterangan: "Sistem mengenali pengeluaran sebagai kebutuhan internet."
+    }
+  ];
+}
+
+function masukModeDemoPortfolio() {
+  modeDemoPortfolio = true;
+
+  currentUser = {
+    id: "demo-user",
+    email: "demo@portfolio.local"
+  };
+
+  currentProfile = {
+    username: "Demo Portfolio",
+    role: "user",
+    status: "active"
+  };
+
+  dataPengeluaran = buatDataDemoPortfolio();
+  targetBulanan = 1500000;
+  riwayatDeteksiAI = buatRiwayatDemoAI();
+  cacheSaranPintarAI = {};
+
+  setFilterBulanIni();
+  tampilkanTargetBulanan();
+  tampilkanModeLogin();
+
+  tampilkanData();
+  refreshTampilan();
+  tampilkanRiwayatDeteksiAI();
+
+  tampilkanPopup(
+    "Mode Demo Portfolio aktif. Data yang tampil adalah data contoh untuk presentasi project.",
+    "success",
+    "Mode Demo"
+  );
+}
+
+function catatRiwayatDeteksiAI(inputAwal, hasilDeteksi, kategori, keterangan) {
+  riwayatDeteksiAI.unshift({
+    waktu: new Date().toLocaleString("id-ID"),
+    input: inputAwal,
+    hasil: hasilDeteksi,
+    kategori: kategori,
+    keterangan: keterangan
+  });
+
+  if (riwayatDeteksiAI.length > 20) {
+    riwayatDeteksiAI.pop();
+  }
+
+  tampilkanRiwayatDeteksiAI();
+}
+
+function tampilkanRiwayatDeteksiAI() {
+  const tabel = document.getElementById("tabelRiwayatAI");
+
+  if (!tabel) {
+    return;
+  }
+
+  tabel.innerHTML = "";
+
+  if (riwayatDeteksiAI.length === 0) {
+    tabel.innerHTML = `
+      <tr>
+        <td colspan="5">Belum ada riwayat deteksi.</td>
+      </tr>
+    `;
+    return;
+  }
+
+  riwayatDeteksiAI.forEach(function (item) {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${item.waktu}</td>
+      <td>${item.input}</td>
+      <td><span class="ai-history-badge">${item.hasil}</span></td>
+      <td>${item.kategori}</td>
+      <td>${item.keterangan}</td>
+    `;
+
+    tabel.appendChild(row);
+  });
+}
+
 function bukaTabAdmin(tab) {
   const dashboardContent = document.getElementById("dashboardContent");
   const adminUserControl = document.getElementById("adminUserControl");
@@ -238,6 +427,7 @@ function refreshTampilan() {
   tampilkanGrafikHarian();
   tampilkanSaranPintarAwal();
   tampilkanInsightItem();
+  tampilkanRiwayatDeteksiAI();
 }
 
 function setButtonLoading(button, isLoading, loadingText = "sabar ya sayang") {
@@ -515,7 +705,18 @@ async function tambahPengeluaran() {
         `Kategori yang dipilih: ${hasilBackend.kategori_final}. ` +
         `${hasilBackend.alasan}`
       );
-    } else {
+    }
+
+    if (hasilBackend && hasilBackend.alasan) {
+      catatRiwayatDeteksiAI(
+        namaInput,
+        hasilBackend.nama_final || namaInput,
+        hasilBackend.kategori_final || kategori,
+        hasilBackend.alasan
+      );
+    }
+
+    else {
       tampilkanKeteranganAI(
         `Sistem menganalisis "${namaInput}" sebagai kategori ${hasilBackend.kategori_final}. ` +
         `${hasilBackend.alasan}`
@@ -596,6 +797,69 @@ async function tambahPengeluaran() {
   refreshTampilan();
 }
 
+async function simpanPengeluaranDemo() {
+  const tanggal = document.getElementById("tanggal").value;
+  const namaInput = document.getElementById("nama").value.trim();
+  const hargaSatuan = ambilAngkaInput("hargaSatuan");
+  const qty = ambilAngkaInput("qty");
+  const kategoriInput = document.getElementById("kategori").value;
+
+  if (tanggal === "" || namaInput === "" || hargaSatuan <= 0 || qty <= 0) {
+    tampilkanPopup("Tanggal, nama pengeluaran, harga satuan, dan jumlah item wajib diisi.", "warning");
+    return;
+  }
+
+  const namaFinal = rapikanNamaPengeluaran(namaInput);
+  const kategoriFinal = deteksiKategoriOtomatis(namaFinal) || kategoriInput;
+  const total = hargaSatuan * qty;
+
+  if (modeEdit === true) {
+    const indexData = dataPengeluaran.findIndex(function (item) {
+      return item.id === idEdit;
+    });
+
+    if (indexData !== -1) {
+      dataPengeluaran[indexData] = {
+        ...dataPengeluaran[indexData],
+        tanggal: tanggal,
+        nama: namaFinal,
+        harga_satuan: hargaSatuan,
+        qty: qty,
+        jumlah: total,
+        kategori: kategoriFinal
+      };
+    }
+
+    resetModeEdit();
+    tampilkanPopup("Data demo berhasil diperbarui.", "success");
+  } else {
+    dataPengeluaran.push({
+      id: "demo-" + Date.now(),
+      user_id: "demo-user",
+      tanggal: tanggal,
+      nama: namaFinal,
+      harga_satuan: hargaSatuan,
+      qty: qty,
+      jumlah: total,
+      kategori: kategoriFinal
+    });
+
+    tampilkanPopup("Data demo berhasil ditambahkan.", "success");
+  }
+
+  catatRiwayatDeteksiAI(
+    namaInput,
+    namaFinal,
+    kategoriFinal,
+    "Mode demo: sistem merapikan nama dan menentukan kategori tanpa menyimpan ke database asli."
+  );
+
+  kosongkanForm();
+  cacheSaranPintarAI = {};
+  tampilkanData();
+  refreshTampilan();
+}
+
 async function simpanPengeluaran() {
   const btnSimpan = document.getElementById("btnSimpan");
 
@@ -606,6 +870,12 @@ async function simpanPengeluaran() {
   setButtonLoading(btnSimpan, true);
 
   try {
+
+    if (modeDemoPortfolio) {
+      await simpanPengeluaranDemo();
+      return;
+    }
+
     if (modeEdit === true) {
       await updatePengeluaran();
     } else {
@@ -836,6 +1106,26 @@ async function hapusData(id) {
 
   if (!yakin) {
     return;
+
+    if (modeDemoPortfolio) {
+      dataPengeluaran = dataPengeluaran.filter(function (item) {
+        return item.id !== id;
+      });
+
+      if (idEdit === id) {
+        resetModeEdit();
+        kosongkanForm();
+        setTanggalHariIni();
+      }
+
+      cacheSaranPintarAI = {};
+      tampilkanData();
+      refreshTampilan();
+
+      tampilkanPopup("Data demo berhasil dihapus.", "success");
+      return;
+    }
+
   }
 
   if (!currentUser) {
@@ -2919,6 +3209,21 @@ async function loginUser() {
 }
 
 async function logoutUser() {
+
+  if (modeDemoPortfolio) {
+    modeDemoPortfolio = false;
+    currentUser = null;
+    currentProfile = null;
+    dataPengeluaran = [];
+    targetBulanan = 0;
+    riwayatDeteksiAI = [];
+    cacheSaranPintarAI = {};
+
+    tampilkanModeLogout();
+    tampilkanPopup("Mode Demo Portfolio ditutup.", "info");
+    return;
+  }
+
   const { error } = await supabaseClient.auth.signOut();
 
   if (error) {

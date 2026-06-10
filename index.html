@@ -9,7 +9,7 @@
 
   <link rel="icon" type="image/png" href="assets/favicon.png" />
 
-  <link rel="stylesheet" href="style.css?v=10" />
+  <link rel="stylesheet" href="style.css?v=11" />
 </head>
 
 <body>
@@ -85,6 +85,10 @@
           Mohon ingat username dan password Anda karena web ini tidak menyediakan fitur lupa password.
         </p>
 
+        <button id="btnDemoPortfolio" type="button" class="demo-login-btn" onclick="masukModeDemoPortfolio()">
+          Masuk Mode Demo Portfolio
+        </button>
+
         <p id="authMessage" class="login-message"></p>
       </div>
     </section>
@@ -113,6 +117,7 @@
         </button>
 
         <div class="floating-nav-panel" id="floatingNavPanel">
+          <button type="button" onclick="scrollKeFitur('tentangAplikasiSection')">Tentang Aplikasi</button>
           <button type="button" onclick="scrollKeFitur('formPengeluaranSection')">Tambah Data</button>
           <button type="button" onclick="scrollKeFitur('targetSection')">Target Bulanan</button>
           <button type="button" onclick="scrollKeFitur('filterSection')">Filter</button>
@@ -120,11 +125,13 @@
           <button type="button" onclick="scrollKeFitur('ringkasanSection')">Ringkasan</button>
           <button type="button" onclick="scrollKeFitur('analisisSection')">Analisis</button>
           <button type="button" onclick="scrollKeFitur('saranPintarSection')">Saran Pintar</button>
+          <button type="button" onclick="scrollKeFitur('riwayatAiSection')">Riwayat Deteksi</button>
           <button type="button" onclick="scrollKeFitur('insightItemSection')">Insight Item</button>
           <button type="button" onclick="scrollKeFitur('grafikKategoriSection')">Grafik Kategori</button>
           <button type="button" onclick="scrollKeFitur('ringkasanKategoriSection')">Ringkasan Kategori</button>
           <button type="button" onclick="scrollKeFitur('grafikHarianSection')">Grafik Harian</button>
           <button type="button" onclick="scrollKeFitur('daftarPengeluaranSection')">Daftar Data</button>
+          <button type="button" onclick="scrollKeFitur('projectInfoSection')">Project Info</button>
         </div>
       </div>
 
@@ -141,6 +148,39 @@
         </div>
 
         <div id="dashboardContent">
+
+          <section id="tentangAplikasiSection" class="card about-app-card">
+            <h2>Tentang Aplikasi</h2>
+
+            <p>
+              Smart Expense Tracker adalah aplikasi pintar berbasis web untuk mencatat,
+              menghitung, dan menganalisis pengeluaran harian. Aplikasi ini membantu pengguna
+              memahami pola pengeluaran, melihat kategori terbesar, membuat laporan PDF,
+              serta mendapatkan saran cerdas berdasarkan data keuangan yang dimasukkan.
+            </p>
+
+            <div class="about-feature-grid">
+              <div>
+                <strong>Login Admin & User</strong>
+                <span>Sistem akses terpisah antara admin dan user biasa.</span>
+              </div>
+
+              <div>
+                <strong>Analisis Pengeluaran</strong>
+                <span>Menganalisis total harian, bulanan, rata-rata, dan target.</span>
+              </div>
+
+              <div>
+                <strong>Deteksi Cerdas</strong>
+                <span>Mendeteksi typo nama pengeluaran dan menyesuaikan kategori.</span>
+              </div>
+
+              <div>
+                <strong>Export PDF</strong>
+                <span>Menghasilkan laporan pengeluaran bulanan yang siap disimpan.</span>
+              </div>
+            </div>
+          </section>
 
           <section id="formPengeluaranSection" class="card">
             <h2>Tambah Pengeluaran</h2>
@@ -285,6 +325,34 @@
             </button>
           </section>
 
+          <section id="riwayatAiSection" class="card smart-card">
+            <h2>Riwayat Deteksi Cerdas</h2>
+
+            <p class="info-text">
+              Bagian ini menampilkan riwayat koreksi nama pengeluaran, deteksi typo, dan kategori yang dipilih sistem.
+            </p>
+
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Waktu</th>
+                    <th>Input Awal</th>
+                    <th>Hasil Deteksi</th>
+                    <th>Kategori</th>
+                    <th>Keterangan</th>
+                  </tr>
+                </thead>
+
+                <tbody id="tabelRiwayatAI">
+                  <tr>
+                    <td colspan="5">Belum ada riwayat deteksi.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
           <section id="insightItemSection" class="card smart-card">
             <h2>Insight Item Sering Dibeli</h2>
             <div id="insightItemText">Belum ada data item untuk dianalisis.</div>
@@ -385,6 +453,36 @@
             </div>
           </section>
 
+          <section id="projectInfoSection" class="card project-info-card">
+            <h2>Project Info</h2>
+
+            <div class="project-info-grid">
+              <div>
+                <span>Nama Aplikasi</span>
+                <strong>Smart Expense Tracker</strong>
+              </div>
+
+              <div>
+                <span>Versi</span>
+                <strong>Prototype v1.0</strong>
+              </div>
+
+              <div>
+                <span>Developer</span>
+                <strong>Riski Hidayat Pasaribu</strong>
+              </div>
+
+              <div>
+                <span>Fokus Project</span>
+                <strong>Web App, AI Analysis, Expense Management</strong>
+              </div>
+            </div>
+
+            <p class="project-stack">
+              Tech Stack: HTML, CSS, JavaScript, Supabase, Gemini AI, Chart.js, jsPDF, GitHub Pages.
+            </p>
+          </section>
+
         </div>
 
         <div class="dashboard-hero">
@@ -458,7 +556,7 @@
 
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="script.js?v=10"></script>
+  <script src="script.js?v=11"></script>
 
   <!-- =========================
        TOAST POPUP
