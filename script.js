@@ -19,6 +19,30 @@ let cacheSaranPintarAI = {};
 
 const BACKEND_URL = "https://wbditvqcdynxppquzqig.supabase.co/functions/v1";
 
+function setButtonLoading(button, isLoading, loadingText = "sabar ya sayang") {
+  if (!button) return;
+
+  if (isLoading) {
+    if (button.disabled) return;
+
+    button.dataset.originalText = button.innerHTML;
+    button.disabled = true;
+    button.classList.add("btn-loading");
+    button.innerHTML = `<span class="btn-spinner"></span>${loadingText}`;
+    return;
+  }
+
+  button.disabled = false;
+  button.classList.remove("btn-loading");
+
+  if (button.id === "btnSimpan") {
+    button.innerHTML = modeEdit ? "Update Data" : "Tambah Data";
+  } else if (button.dataset.originalText) {
+    button.innerHTML = button.dataset.originalText;
+  }
+
+  delete button.dataset.originalText;
+}
 
 document.addEventListener("DOMContentLoaded", async function () {
 
@@ -216,6 +240,24 @@ function refreshTampilan() {
   tampilkanInsightItem();
 }
 
+function setButtonLoading(button, isLoading, loadingText = "sabar ya sayang") {
+  if (!button) return;
+
+  if (isLoading) {
+    button.dataset.originalText = button.innerHTML;
+    button.disabled = true;
+    button.classList.add("btn-loading");
+    button.innerHTML = `<span class="btn-spinner"></span>${loadingText}`;
+  } else {
+    button.disabled = false;
+    button.classList.remove("btn-loading");
+
+    if (button.dataset.originalText) {
+      button.innerHTML = button.dataset.originalText;
+      delete button.dataset.originalText;
+    }
+  }
+}
 
 function tampilkanPopup(pesan, tipe = "info", judul = "") {
   const container = document.getElementById("toastContainer");
@@ -554,11 +596,26 @@ async function tambahPengeluaran() {
   refreshTampilan();
 }
 
-function simpanPengeluaran() {
-  if (modeEdit === true) {
-    updatePengeluaran();
-  } else {
-    tambahPengeluaran();
+async function simpanPengeluaran() {
+  const btnSimpan = document.getElementById("btnSimpan");
+
+  if (btnSimpan && btnSimpan.disabled) {
+    return;
+  }
+
+  setButtonLoading(btnSimpan, true);
+
+  try {
+    if (modeEdit === true) {
+      await updatePengeluaran();
+    } else {
+      await tambahPengeluaran();
+    }
+  } catch (error) {
+    console.error("Gagal menyimpan pengeluaran:", error);
+    tampilkanPopup("Terjadi kesalahan saat menyimpan data.", "error");
+  } finally {
+    setButtonLoading(btnSimpan, false);
   }
 }
 
@@ -3943,10 +4000,7 @@ async function buatSaranPintarAI() {
     return;
   }
 
-  if (btnSaran) {
-    btnSaran.disabled = true;
-    btnSaran.innerText = "Membuat Saran...";
-  }
+  setButtonLoading(btnSaran, true);
 
   saranText.innerText =
     "Sedang menganalisis pola pengeluaran dan membuat saran pintar...";
@@ -4001,10 +4055,7 @@ async function buatSaranPintarAI() {
     tampilkanSaranPintarLokal();
 
   } finally {
-    if (btnSaran) {
-      btnSaran.disabled = false;
-      btnSaran.innerText = "Buat Saran Pintar";
-    }
+    setButtonLoading(btnSaran, false);
   }
 }
 
@@ -4485,3 +4536,44 @@ async function analisisPengeluaranDenganBackend(tanggal, nama, hargaSatuan, qty,
     };
   }
 }
+
+function toggleDashboardNav() {
+  const nav = document.getElementById("floatingDashboardNav");
+
+  if (!nav) {
+    return;
+  }
+
+  nav.classList.toggle("open");
+}
+
+function scrollKeFitur(sectionId) {
+  const target = document.getElementById(sectionId);
+  const nav = document.getElementById("floatingDashboardNav");
+
+  if (!target) {
+    tampilkanPopup("Bagian dashboard ini belum ditemukan.", "warning");
+    return;
+  }
+
+  target.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+
+  if (nav) {
+    nav.classList.remove("open");
+  }
+}
+
+document.addEventListener("click", function (event) {
+  const nav = document.getElementById("floatingDashboardNav");
+
+  if (!nav) {
+    return;
+  }
+
+  if (!nav.contains(event.target)) {
+    nav.classList.remove("open");
+  }
+});

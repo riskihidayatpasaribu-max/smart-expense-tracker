@@ -1715,3 +1715,128 @@ button.eye-btn.password-visible {
     padding-right: 58px !important;
   }
 }
+
+
+/* ================================
+   BUTTON LOADING - SABAR YA SAYANG
+================================ */
+
+.btn-loading {
+  pointer-events: none !important;
+  opacity: 0.88 !important;
+}
+
+.btn-loading .btn-spinner {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  margin-right: 8px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.38);
+  border-top-color: #ffffff;
+  vertical-align: -3px;
+  animation: spinLoading 0.8s linear infinite;
+}
+
+@keyframes spinLoading {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ================================
+   FLOATING DASHBOARD NAV
+================================ */
+
+.floating-dashboard-nav {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 9997;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.floating-nav-toggle {
+  width: auto !important;
+  min-width: 118px;
+  padding: 12px 16px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, #38bdf8, #7c3aed) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow: 0 18px 42px rgba(56, 189, 248, 0.26) !important;
+}
+
+.floating-nav-toggle:hover {
+  transform: translateY(-2px) !important;
+}
+
+.floating-nav-panel {
+  display: none;
+  width: 245px;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 10px;
+  border-radius: 18px;
+  background: rgba(9, 18, 36, 0.84);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+
+.floating-dashboard-nav.open .floating-nav-panel {
+  display: grid;
+  gap: 8px;
+  animation: floatingMenuIn 0.2s ease both;
+}
+
+.floating-nav-panel button {
+  width: 100% !important;
+  padding: 10px 12px !important;
+  border-radius: 12px !important;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #e5e7eb !important;
+  box-shadow: none !important;
+  font-size: 13px;
+}
+
+.floating-nav-panel button:hover {
+  transform: none !important;
+  background: rgba(56, 189, 248, 0.18) !important;
+  color: #ffffff !important;
+}
+
+@keyframes floatingMenuIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 768px) {
+  .floating-dashboard-nav {
+    right: 14px;
+    bottom: 14px;
+  }
+
+  .floating-nav-panel {
+    width: min(245px, calc(100vw - 28px));
+    max-height: 65vh;
+  }
+
+  .floating-nav-toggle {
+    min-width: 105px;
+    padding: 11px 14px !important;
+    font-size: 13px;
+  }
+}

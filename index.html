@@ -9,7 +9,7 @@
 
   <link rel="icon" type="image/png" href="assets/favicon.png" />
 
-  <link rel="stylesheet" href="style.css?v=9" />
+  <link rel="stylesheet" href="style.css?v=10" />
 </head>
 
 <body>
@@ -107,6 +107,27 @@
     <div id="appSection" class="dashboard-page" style="display: none;">
       <div class="dashboard-bg"></div>
 
+      <div class="floating-dashboard-nav" id="floatingDashboardNav">
+        <button type="button" class="floating-nav-toggle" onclick="toggleDashboardNav()">
+          ☰ Fitur
+        </button>
+
+        <div class="floating-nav-panel" id="floatingNavPanel">
+          <button type="button" onclick="scrollKeFitur('formPengeluaranSection')">Tambah Data</button>
+          <button type="button" onclick="scrollKeFitur('targetSection')">Target Bulanan</button>
+          <button type="button" onclick="scrollKeFitur('filterSection')">Filter</button>
+          <button type="button" onclick="scrollKeFitur('pdfSection')">Laporan PDF</button>
+          <button type="button" onclick="scrollKeFitur('ringkasanSection')">Ringkasan</button>
+          <button type="button" onclick="scrollKeFitur('analisisSection')">Analisis</button>
+          <button type="button" onclick="scrollKeFitur('saranPintarSection')">Saran Pintar</button>
+          <button type="button" onclick="scrollKeFitur('insightItemSection')">Insight Item</button>
+          <button type="button" onclick="scrollKeFitur('grafikKategoriSection')">Grafik Kategori</button>
+          <button type="button" onclick="scrollKeFitur('ringkasanKategoriSection')">Ringkasan Kategori</button>
+          <button type="button" onclick="scrollKeFitur('grafikHarianSection')">Grafik Harian</button>
+          <button type="button" onclick="scrollKeFitur('daftarPengeluaranSection')">Daftar Data</button>
+        </div>
+      </div>
+
       <div class="dashboard-container">
 
         <div class="admin-tab-menu" id="adminTabMenu" style="display: none;">
@@ -121,7 +142,7 @@
 
         <div id="dashboardContent">
 
-          <section class="card">
+          <section id="formPengeluaranSection" class="card">
             <h2>Tambah Pengeluaran</h2>
 
             <div class="form-group">
@@ -174,7 +195,7 @@
             </button>
           </section>
 
-          <section class="card">
+          <section id="targetSection" class="card">
             <h2>Target Pengeluaran Bulanan</h2>
 
             <div class="form-group">
@@ -187,7 +208,7 @@
             <p id="targetInfo" class="info-text">Belum ada target bulanan.</p>
           </section>
 
-          <section class="card">
+          <section id="filterSection" class="card">
             <h2>Filter Data</h2>
 
             <div class="filter-row">
@@ -220,7 +241,7 @@
             <p id="filterInfo" class="info-text">Menampilkan data bulan ini.</p>
           </section>
 
-          <section class="card">
+          <section id="pdfSection" class="card">
             <h2>Laporan PDF</h2>
 
             <p class="info-text">
@@ -230,7 +251,7 @@
             <button onclick="exportPDF()">Export ke PDF</button>
           </section>
 
-          <section class="summary">
+          <section id="ringkasanSection" class="summary">
             <div class="summary-card">
               <h3>Total Hari Ini</h3>
               <p id="totalHariIni">Rp0</p>
@@ -247,12 +268,12 @@
             </div>
           </section>
 
-          <section class="card">
+          <section id="analisisSection" class="card">
             <h2>Analisis Pengeluaran</h2>
             <p id="analisisText">Belum ada data untuk dianalisis.</p>
           </section>
 
-          <section class="card smart-card">
+          <section id="saranPintarSection" class="card smart-card">
             <h2>Saran Pintar</h2>
 
             <p id="saranPintarText">
@@ -264,19 +285,19 @@
             </button>
           </section>
 
-          <section class="card smart-card">
+          <section id="insightItemSection" class="card smart-card">
             <h2>Insight Item Sering Dibeli</h2>
             <div id="insightItemText">Belum ada data item untuk dianalisis.</div>
           </section>
 
-          <section class="card">
+          <section id="grafikKategoriSection" class="card">
             <h2>Grafik Pengeluaran per Kategori</h2>
             <div class="chart-box">
               <canvas id="grafikKategori"></canvas>
             </div>
           </section>
 
-          <section class="card">
+          <section id="ringkasanKategoriSection" class="card">
             <h2>Ringkasan Kategori</h2>
 
             <div class="table-responsive">
@@ -296,14 +317,14 @@
             </div>
           </section>
 
-          <section class="card">
+          <section id="grafikHarianSection" class="card">
             <h2>Grafik Pengeluaran Harian</h2>
             <div class="chart-box">
               <canvas id="grafikHarian"></canvas>
             </div>
           </section>
 
-          <section class="card">
+          <section id="daftarPengeluaranSection" class="card">
             <h2>Daftar Pengeluaran</h2>
 
             <div class="table-filter">
@@ -437,7 +458,7 @@
 
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="script.js?v=9"></script>
+  <script src="script.js?v=10"></script>
 
   <!-- =========================
        TOAST POPUP
