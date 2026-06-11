@@ -9,7 +9,7 @@
 
   <link rel="icon" type="image/png" href="assets/favicon.png" />
 
-  <link rel="stylesheet" href="style.css?v=11" />
+  <link rel="stylesheet" href="style.css?v=12" />
 </head>
 
 <body>
@@ -117,6 +117,7 @@
         </button>
 
         <div class="floating-nav-panel" id="floatingNavPanel">
+          <button type="button" onclick="bukaTentangAplikasi()">Tentang Aplikasi</button>
           <button type="button" onclick="scrollKeFitur('tentangAplikasiSection')">Tentang Aplikasi</button>
           <button type="button" onclick="scrollKeFitur('formPengeluaranSection')">Tambah Data</button>
           <button type="button" onclick="scrollKeFitur('targetSection')">Target Bulanan</button>
@@ -149,38 +150,6 @@
 
         <div id="dashboardContent">
 
-          <section id="tentangAplikasiSection" class="card about-app-card">
-            <h2>Tentang Aplikasi</h2>
-
-            <p>
-              Smart Expense Tracker adalah aplikasi pintar berbasis web untuk mencatat,
-              menghitung, dan menganalisis pengeluaran harian. Aplikasi ini membantu pengguna
-              memahami pola pengeluaran, melihat kategori terbesar, membuat laporan PDF,
-              serta mendapatkan saran cerdas berdasarkan data keuangan yang dimasukkan.
-            </p>
-
-            <div class="about-feature-grid">
-              <div>
-                <strong>Login Admin & User</strong>
-                <span>Sistem akses terpisah antara admin dan user biasa.</span>
-              </div>
-
-              <div>
-                <strong>Analisis Pengeluaran</strong>
-                <span>Menganalisis total harian, bulanan, rata-rata, dan target.</span>
-              </div>
-
-              <div>
-                <strong>Deteksi Cerdas</strong>
-                <span>Mendeteksi typo nama pengeluaran dan menyesuaikan kategori.</span>
-              </div>
-
-              <div>
-                <strong>Export PDF</strong>
-                <span>Menghasilkan laporan pengeluaran bulanan yang siap disimpan.</span>
-              </div>
-            </div>
-          </section>
 
           <section id="formPengeluaranSection" class="card">
             <h2>Tambah Pengeluaran</h2>
@@ -453,35 +422,6 @@
             </div>
           </section>
 
-          <section id="projectInfoSection" class="card project-info-card">
-            <h2>Project Info</h2>
-
-            <div class="project-info-grid">
-              <div>
-                <span>Nama Aplikasi</span>
-                <strong>Smart Expense Tracker</strong>
-              </div>
-
-              <div>
-                <span>Versi</span>
-                <strong>Prototype v1.0</strong>
-              </div>
-
-              <div>
-                <span>Developer</span>
-                <strong>Riski Hidayat Pasaribu</strong>
-              </div>
-
-              <div>
-                <span>Fokus Project</span>
-                <strong>Web App, AI Analysis, Expense Management</strong>
-              </div>
-            </div>
-
-            <p class="project-stack">
-              Tech Stack: HTML, CSS, JavaScript, Supabase, Gemini AI, Chart.js, jsPDF, GitHub Pages.
-            </p>
-          </section>
 
         </div>
 
@@ -556,7 +496,7 @@
 
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="script.js?v=11"></script>
+  <script src="script.js?v=12"></script>
 
   <!-- =========================
        TOAST POPUP
@@ -580,6 +520,71 @@
           Lanjutkan
         </button>
       </div>
+    </div>
+  </div>
+
+  <div id="aboutModal" class="about-modal">
+    <div class="about-modal-box">
+      <button type="button" class="about-close-btn" onclick="tutupTentangAplikasi()">
+        ✕
+      </button>
+
+      <div class="about-modal-header">
+        <p class="about-kicker">Project Portfolio</p>
+        <h2>Smart Expense Tracker</h2>
+        <p>
+          Aplikasi pintar berbasis web untuk mencatat, menghitung, dan menganalisis
+          pengeluaran harian dengan bantuan sistem deteksi cerdas.
+        </p>
+      </div>
+
+      <div class="about-feature-grid">
+        <div>
+          <strong>Login Admin & User</strong>
+          <span>Sistem akses terpisah antara admin dan user biasa.</span>
+        </div>
+
+        <div>
+          <strong>Analisis Pengeluaran</strong>
+          <span>Menganalisis total harian, bulanan, rata-rata, target, dan pola pengeluaran.</span>
+        </div>
+
+        <div>
+          <strong>Deteksi Cerdas</strong>
+          <span>Mendeteksi typo nama pengeluaran dan membantu menentukan kategori.</span>
+        </div>
+
+        <div>
+          <strong>Export PDF</strong>
+          <span>Menghasilkan laporan pengeluaran bulanan yang siap disimpan.</span>
+        </div>
+      </div>
+
+      <div class="project-info-grid">
+        <div>
+          <span>Versi</span>
+          <strong>Prototype v12.0</strong>
+        </div>
+
+        <div>
+          <span>Developer</span>
+          <strong>Riski Hidayat Pasaribu</strong>
+        </div>
+
+        <div>
+          <span>Fokus Project</span>
+          <strong>Web App, AI Analysis, Expense Management</strong>
+        </div>
+
+        <div>
+          <span>Deployment</span>
+          <strong>GitHub Pages + Supabase</strong>
+        </div>
+      </div>
+
+      <p class="project-stack">
+        Tech Stack: HTML, CSS, JavaScript, Supabase, Gemini AI, Chart.js, jsPDF, dan GitHub Pages.
+      </p>
     </div>
   </div>
 

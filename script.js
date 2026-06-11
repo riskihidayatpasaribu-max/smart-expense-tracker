@@ -4882,3 +4882,46 @@ document.addEventListener("click", function (event) {
     nav.classList.remove("open");
   }
 });
+
+function bukaTentangAplikasi() {
+  const modal = document.getElementById("aboutModal");
+  const nav = document.getElementById("floatingDashboardNav");
+
+  if (!modal) {
+    return;
+  }
+
+  modal.classList.add("show");
+
+  if (nav) {
+    nav.classList.remove("open");
+  }
+}
+
+function tutupTentangAplikasi() {
+  const modal = document.getElementById("aboutModal");
+
+  if (!modal) {
+    return;
+  }
+
+  modal.classList.remove("show");
+}
+
+document.addEventListener("click", function (event) {
+  const modal = document.getElementById("aboutModal");
+
+  if (!modal) {
+    return;
+  }
+
+  if (event.target === modal) {
+    tutupTentangAplikasi();
+  }
+});
+
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Escape") {
+    tutupTentangAplikasi();
+  }
+});
