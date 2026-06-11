@@ -2132,3 +2132,33 @@ button.eye-btn.password-visible {
     padding-right: 42px;
   }
 }
+
+/* Hilangkan eye icon bawaan browser pada input password */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-caps-lock-indicator {
+  visibility: hidden;
+  display: none !important;
+  pointer-events: none;
+}
+
+.password-wrapper input {
+  padding-right: 64px !important;
+}
+
+.eye-btn {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px !important;
+  height: 48px !important;
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

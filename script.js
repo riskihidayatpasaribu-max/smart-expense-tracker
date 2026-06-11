@@ -3671,7 +3671,8 @@ async function muatDataPengeluaranDariSupabase() {
   });
 }
 
-function exportPDF() {
+async function exportPDF() {
+
   if (!currentUser) {
     tampilkanPopup("Kamu harus login terlebih dahulu.", "warning");
     return;
@@ -3686,8 +3687,19 @@ function exportPDF() {
     return;
   }
 
+  const btnExportPDF = document.getElementById("btnExportPDF");
+  setButtonLoading(btnExportPDF, true, "menyiapkan pdf");
+
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("p", "mm", "a4");
+
+  let logoBase64 = null;
+
+  try {
+    logoBase64 = await loadImageAsBase64("assets/favicon.png");
+  } catch (error) {
+    console.warn("Logo PDF tidak berhasil dimuat:", error);
+  }
 
   const developerName = "Riski Hidayat Pasaribu";
   const namaAplikasi = "Smart Expense Tracker";
@@ -3737,23 +3749,41 @@ function exportPDF() {
   const warnaBorder = [226, 232, 240];
 
   // =========================
-  // Header PDF
+  // Header PDF - Professional Brand
   // =========================
   doc.setFillColor(...warnaUtama);
-  doc.rect(0, 0, 210, 34, "F");
+  doc.rect(0, 0, 210, 42, "F");
+
+  if (logoBase64) {
+    doc.addImage(logoBase64, "PNG", 14, 10, 18, 18);
+  }
 
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(18);
-  doc.text("Laporan Pengeluaran Bulanan", 14, 15);
+  doc.text(namaAplikasi, 36, 16);
 
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.text(namaAplikasi, 14, 22);
+  doc.setFontSize(9);
+  doc.text(
+    "Aplikasi pintar berbasis web menghitung pengeluaran harian",
+    36,
+    23
+  );
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.text("Laporan Pengeluaran Bulanan", 14, 36);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.text(`Periode: ${periode}`, 196, 36, {
+    align: "right"
+  });
 
   doc.setDrawColor(...warnaAksen);
   doc.setLineWidth(0.8);
-  doc.line(14, 28, 196, 28);
+  doc.line(14, 39, 196, 39);
 
   // =========================
   // Informasi Laporan
@@ -3761,7 +3791,7 @@ function exportPDF() {
   doc.setTextColor(15, 23, 42);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
-  doc.text("Informasi Laporan", 14, 44);
+  doc.text("Informasi Laporan", 14, 52);
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
@@ -3776,7 +3806,7 @@ function exportPDF() {
   ];
 
   doc.autoTable({
-    startY: 49,
+    startY: 57,
     body: metadataRows,
     theme: "plain",
     styles: {
@@ -3977,6 +4007,32 @@ function exportPDF() {
   const namaFile = `laporan-pengeluaran-${filterTahun}-${String(filterBulan).padStart(2, "0")}.pdf`;
 
   doc.save(namaFile);
+
+  setButtonLoading(btnExportPDF, false);
+}
+
+function loadImageAsBase64(src) {
+  return new Promise(function (resolve, reject) {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+
+    img.onload = function () {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0);
+
+      resolve(canvas.toDataURL("image/png"));
+    };
+
+    img.onerror = function () {
+      reject(new Error("Logo gagal dimuat."));
+    };
+
+    img.src = src;
+  });
 }
 
 function buatDataRingkasanKategoriPDF(data) {
