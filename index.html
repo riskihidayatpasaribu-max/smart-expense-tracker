@@ -9,7 +9,7 @@
 
   <link rel="icon" type="image/png" href="assets/favicon.png" />
 
-  <link rel="stylesheet" href="style.css?v=15" />
+  <link rel="stylesheet" href="style.css?v=18" />
 </head>
 
 <body>
@@ -183,8 +183,16 @@
                 <option value="Kesehatan">Kesehatan</option>
                 <option value="Hiburan">Hiburan</option>
                 <option value="Tagihan">Tagihan</option>
-                <option value="Utang/Bon">Utang/Bon</option>
                 <option value="Lainnya">Lainnya</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="metodePembayaran">Metode Pembayaran</label>
+              <select id="metodePembayaran">
+                <option value="Cash">Cash</option>
+                <option value="Saldo">Saldo</option>
+                <option value="Utang/Bon">Utang/Bon</option>
               </select>
             </div>
 
@@ -381,7 +389,6 @@
                   <option value="Kesehatan">Kesehatan</option>
                   <option value="Hiburan">Hiburan</option>
                   <option value="Tagihan">Tagihan</option>
-                  <option value="Utang/Bon">Utang/Bon</option>
                   <option value="Lainnya">Lainnya</option>
                 </select>
               </div>
@@ -406,6 +413,8 @@
                     <th>Tanggal</th>
                     <th>Nama</th>
                     <th>Kategori</th>
+                    <th>Metode</th>
+                    <th>Status Utang</th>
                     <th>Harga Satuan</th>
                     <th>Qty</th>
                     <th>Total</th>
@@ -494,7 +503,7 @@
 
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="script.js?v=15"></script>
+  <script src="script.js?v=18"></script>
 
   <!-- =========================
        TOAST POPUP
@@ -561,7 +570,7 @@
       <div class="project-info-grid">
         <div>
           <span>Versi</span>
-          <strong>Prototype v15.0</strong>
+          <strong>Prototype v18.0</strong>
         </div>
 
         <div>

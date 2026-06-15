@@ -653,6 +653,8 @@ async function tambahPengeluaran() {
   const hargaSatuan = ambilAngkaInput("hargaSatuan");
   const qty = ambilAngkaInput("qty");
   const kategori = document.getElementById("kategori").value;
+  const metodePembayaran = document.getElementById("metodePembayaran").value;
+  const statusUtang = metodePembayaran === "Utang/Bon" ? "Belum Lunas" : null;
 
   if (!currentUser) {
     tampilkanPopup("Kamu harus login terlebih dahulu.");
@@ -757,7 +759,9 @@ async function tambahPengeluaran() {
         kategori: hasilGabung.kategori_lama || kategoriFinal,
         harga_satuan: hargaSatuan,
         qty: qtyGabungan,
-        jumlah: totalGabungan
+        jumlah: totalGabungan,
+        metode_pembayaran: metodePembayaran,
+        status_utang: statusUtang
       })
       .eq("id", hasilGabung.item_id)
       .eq("user_id", currentUser.id);
@@ -781,7 +785,9 @@ async function tambahPengeluaran() {
       harga_satuan: hargaSatuan,
       qty: qty,
       jumlah: totalBaru,
-      kategori: kategoriFinal
+      kategori: kategoriFinal,
+      metode_pembayaran: metodePembayaran,
+      status_utang: statusUtang
     });
 
     if (error) {
@@ -803,6 +809,8 @@ async function simpanPengeluaranDemo() {
   const hargaSatuan = ambilAngkaInput("hargaSatuan");
   const qty = ambilAngkaInput("qty");
   const kategoriInput = document.getElementById("kategori").value;
+  const metodePembayaran = document.getElementById("metodePembayaran").value;
+  const statusUtang = metodePembayaran === "Utang/Bon" ? "Belum Lunas" : null;
 
   if (tanggal === "" || namaInput === "" || hargaSatuan <= 0 || qty <= 0) {
     tampilkanPopup("Tanggal, nama pengeluaran, harga satuan, dan jumlah item wajib diisi.", "warning");
@@ -826,7 +834,9 @@ async function simpanPengeluaranDemo() {
         harga_satuan: hargaSatuan,
         qty: qty,
         jumlah: total,
-        kategori: kategoriFinal
+        kategori: kategoriFinal,
+        metode_pembayaran: metodePembayaran,
+        status_utang: statusUtang
       };
     }
 
@@ -841,7 +851,9 @@ async function simpanPengeluaranDemo() {
       harga_satuan: hargaSatuan,
       qty: qty,
       jumlah: total,
-      kategori: kategoriFinal
+      kategori: kategoriFinal,
+      metode_pembayaran: metodePembayaran,
+      status_utang: statusUtang
     });
 
     tampilkanPopup("Data demo berhasil ditambahkan.", "success");
@@ -908,6 +920,15 @@ function editData(id) {
   document.getElementById("hargaSatuan").value = dataDipilih.harga_satuan;
   document.getElementById("qty").value = dataDipilih.qty;
   document.getElementById("kategori").value = dataDipilih.kategori;
+  document.getElementById("metodePembayaran").value = dataDipilih.metode_pembayaran || "Cash";
+
+  if (dataDipilih.metode_pembayaran) {
+    document.getElementById("metodePembayaran").value = dataDipilih.metode_pembayaran;
+  } else if (dataDipilih.kategori === "Utang/Bon") {
+    document.getElementById("metodePembayaran").value = "Utang/Bon";
+  } else {
+    document.getElementById("metodePembayaran").value = "Cash";
+  }
 
   modeEdit = true;
   idEdit = id;
@@ -927,6 +948,9 @@ async function updatePengeluaran() {
   const hargaSatuan = ambilAngkaInput("hargaSatuan");
   const qty = ambilAngkaInput("qty");
   const kategori = document.getElementById("kategori").value;
+
+  const metodePembayaran = document.getElementById("metodePembayaran").value;
+  const statusUtang = metodePembayaran === "Utang/Bon" ? "Belum Lunas" : null;
 
   if (!currentUser) {
     tampilkanPopup("Kamu harus login terlebih dahulu.");
@@ -948,7 +972,9 @@ async function updatePengeluaran() {
       harga_satuan: hargaSatuan,
       qty: qty,
       jumlah: total,
-      kategori: kategori
+      kategori: kategori,
+      metode_pembayaran: metodePembayaran,
+      status_utang: statusUtang
     })
     .eq("id", idEdit)
     .eq("user_id", currentUser.id);
@@ -986,6 +1012,8 @@ function kosongkanForm() {
   document.getElementById("nama").value = "";
   document.getElementById("hargaSatuan").value = "";
   document.getElementById("qty").value = "1";
+  document.getElementById("kategori").value = "Makanan";
+  document.getElementById("metodePembayaran").value = "Cash";
 }
 
 function tampilkanData() {
@@ -1052,7 +1080,7 @@ function tampilkanData() {
       rowTanggal.className = "date-separator-row";
 
       rowTanggal.innerHTML = `
-      <td colspan="7">
+      <td colspan="9">
         <span>${formatTanggalIndonesia(item.tanggal)}</span>
       </td>
     `;
@@ -1071,18 +1099,31 @@ function tampilkanData() {
     const qty = Math.round(Number(item.qty) || 1);
     const total = hargaSatuan * qty;
 
+    let tombolLunas = "";
+
+    if (item.metode_pembayaran === "Utang/Bon" && item.status_utang !== "Lunas") {
+      tombolLunas = `
+        <button class="btn-lunas" onclick="lunaskanUtang('${item.id}')">
+          Lunas
+        </button>
+      `;
+    }
+
     row.innerHTML = `
-    <td>${item.tanggal}</td>
-    <td>${item.nama}</td>
-    <td>${item.kategori}</td>
-    <td>${formatRupiah(hargaSatuan)}</td>
-    <td>x${qty}</td>
-    <td>${formatRupiah(total)}</td>
-    <td>
-      <button class="edit-btn" onclick="editData('${item.id}')">Edit</button>
-      <button class="delete-btn" onclick="hapusData('${item.id}')">Hapus</button>
-    </td>
-  `;
+      <td>${item.tanggal}</td>
+      <td>${item.nama}</td>
+      <td>${item.kategori}</td>
+      <td>${item.metode_pembayaran || "Cash"}</td>
+      <td>${tampilkanStatusUtang(item)}</td>
+      <td>${formatRupiah(hargaSatuan)}</td>
+      <td>x${qty}</td>
+      <td>${formatRupiah(total)}</td>
+      <td>
+        ${tombolLunas}
+        <button class="edit-btn" onclick="editData('${item.id}')">Edit</button>
+        <button class="delete-btn" onclick="hapusData('${item.id}')">Hapus</button>
+      </td>
+    `;
 
     tabel.appendChild(row);
   });
@@ -1091,7 +1132,7 @@ function tampilkanData() {
     const row = document.createElement("tr");
 
     row.innerHTML = `
-      <td colspan="7">Data tidak ditemukan.</td>
+      <td colspan="9">Data tidak ditemukan.</td>
     `;
 
     tabel.appendChild(row);
@@ -1192,6 +1233,38 @@ function hitungRingkasan() {
   document.getElementById("prediksiBulan").innerText = formatRupiah(prediksiAkhirBulan);
 }
 
+function hitungAnalisisUtang() {
+  let totalUtangBelumLunas = 0;
+  let totalUtangLunas = 0;
+  let jumlahUtangBelumLunas = 0;
+  let jumlahUtangLunas = 0;
+
+  const dataTerfilter = dataPengeluaran.filter(function (item) {
+    return cekDataSesuaiFilter(item);
+  });
+
+  dataTerfilter.forEach(function (item) {
+    if (item.metode_pembayaran === "Utang/Bon") {
+      const jumlah = Number(item.jumlah) || 0;
+
+      if (item.status_utang === "Lunas") {
+        totalUtangLunas += jumlah;
+        jumlahUtangLunas++;
+      } else {
+        totalUtangBelumLunas += jumlah;
+        jumlahUtangBelumLunas++;
+      }
+    }
+  });
+
+  return {
+    totalUtangBelumLunas,
+    totalUtangLunas,
+    jumlahUtangBelumLunas,
+    jumlahUtangLunas
+  };
+}
+
 function analisisPengeluaran() {
   const analisisText = document.getElementById("analisisText");
 
@@ -1289,9 +1362,28 @@ Target bulanan: Belum diatur
 
   if (kategoriTerbesar !== null) {
     teksKategori = `
-Kategori terbesar bulan ini: ${kategoriTerbesar.nama}
-Total kategori tersebut: ${formatRupiah(kategoriTerbesar.total)}
-    `;
+      Kategori terbesar bulan ini: ${kategoriTerbesar.nama}
+      Total kategori tersebut: ${formatRupiah(kategoriTerbesar.total)}
+      `;
+  }
+
+  const analisisUtang = hitungAnalisisUtang();
+
+  let teksUtang = "";
+
+  if (analisisUtang.jumlahUtangBelumLunas > 0 || analisisUtang.jumlahUtangLunas > 0) {
+    teksUtang = `
+Analisis Utang/Bon:
+Total utang belum lunas: ${formatRupiah(analisisUtang.totalUtangBelumLunas)}
+Jumlah utang belum lunas: ${analisisUtang.jumlahUtangBelumLunas} transaksi
+Total utang sudah lunas: ${formatRupiah(analisisUtang.totalUtangLunas)}
+Jumlah utang sudah lunas: ${analisisUtang.jumlahUtangLunas} transaksi
+  `;
+  } else {
+    teksUtang = `
+Analisis Utang/Bon:
+Belum ada transaksi utang/bon pada periode ini.
+  `;
   }
 
   analisisText.innerText = `
@@ -1305,6 +1397,8 @@ Jumlah hari dengan data: ${jumlahHariDenganData} hari
 ${analisisTarget}
 
 ${teksKategori}
+
+${teksUtang}
 
 Saran:
 ${saran}
@@ -2325,42 +2419,7 @@ function deteksiKategoriOtomatis(namaPengeluaran) {
       "utan", "utang", "utangg", "utanng", "uteng", "utng", "uttang", "uutang", "wfi", "wif", "wiffi",
       "wifi", "wifi bulanan", "wifii", "wify", "wii", "wiifi", "wivi", "wwifi", "wyfi"
     ],
-    "Utang/Bon": [
-      "utang",
-      "hutang",
-      "bon",
-      "ngebon",
-      "ngutang",
-      "pinjam",
-      "pinjaman",
-      "dipinjam",
-      "meminjam",
-      "bayar utang",
-      "bayar hutang",
-      "bayar bon",
-      "cicil utang",
-      "cicil hutang",
-      "cicilan utang",
-      "cicilan hutang",
-      "kasbon",
-      "kas bon",
-      "tempo",
-      "bayar tempo",
-      "bon warung",
-      "bon kantin",
-      "bon makan",
-      "utang makan",
-      "hutang makan",
-      "utang teman",
-      "hutang ke teman",
-      "pinjam uang",
-      "bayar pinjaman",
-      "pelunasan",
-      "lunas",
-      "melunasi",
-      "tagihan utang",
-      "tagihan hutang"
-    ],
+
 
     "Lainnya": [
       "aacara", "aadministrasi", "aamplop", "aara", "acaa", "acaara", "acar", "acara", "acaraa", "acare",
@@ -3121,20 +3180,9 @@ async function loginUser() {
 
     if (credential.email === "" || credential.password === "") {
       const pesan = `${credential.tipe} dan password wajib diisi.`;
-      authMessage.innerText = pesan;
+      if (authMessage) authMessage.innerText = pesan;
       tampilkanPopup(pesan, "warning");
       return;
-    }
-
-    if (modeLogin === "user") {
-      const username = document.getElementById("usernameInput").value.trim();
-
-      if (username === "") {
-        const pesan = "Username wajib diisi.";
-        authMessage.innerText = pesan;
-        tampilkanPopup(pesan, "warning");
-        return;
-      }
     }
 
     const { data, error } = await supabaseClient.auth.signInWithPassword({
@@ -3144,65 +3192,67 @@ async function loginUser() {
 
     if (error) {
       const pesan = "Login gagal. Email, username, atau password tidak sesuai.";
-      authMessage.innerText = pesan;
+      if (authMessage) authMessage.innerText = pesan;
       tampilkanPopup(pesan, "error");
       return;
     }
 
     currentUser = data.user;
-
     currentProfile = await ambilProfileUser();
 
     if (!currentProfile) {
+      const pesan = "Akun ini belum memiliki profil. Hubungi admin.";
+      if (authMessage) authMessage.innerText = pesan;
+      tampilkanPopup(pesan, "error");
       await supabaseClient.auth.signOut();
       currentUser = null;
-
-      const pesan = "Akun ini belum memiliki profil. Hubungi admin.";
-      authMessage.innerText = pesan;
-      tampilkanPopup(pesan, "error");
       return;
     }
 
     if (currentProfile.status !== "active") {
+      const pesan = "Akun ini sedang dinonaktifkan oleh admin.";
+      if (authMessage) authMessage.innerText = pesan;
+      tampilkanPopup(pesan, "error");
       await supabaseClient.auth.signOut();
       currentUser = null;
-
-      const pesan = "Akun ini sedang dinonaktifkan oleh admin.";
-      authMessage.innerText = pesan;
-      tampilkanPopup(pesan, "error");
       return;
     }
 
     if (modeLogin === "admin" && currentProfile.role !== "admin") {
+      const pesan = "Login ditolak. Akun ini bukan admin.";
+      if (authMessage) authMessage.innerText = pesan;
+      tampilkanPopup(pesan, "error");
       await supabaseClient.auth.signOut();
       currentUser = null;
-
-      const pesan = "Login ditolak. Akun ini bukan admin.";
-      authMessage.innerText = pesan;
-      tampilkanPopup(pesan, "error");
       return;
     }
 
     if (modeLogin === "user" && currentProfile.role !== "user") {
+      const pesan = "Login ditolak. Akun ini bukan user biasa.";
+      if (authMessage) authMessage.innerText = pesan;
+      tampilkanPopup(pesan, "error");
       await supabaseClient.auth.signOut();
       currentUser = null;
-
-      const pesan = "Login ditolak. Akun ini bukan user biasa.";
-      authMessage.innerText = pesan;
-      tampilkanPopup(pesan, "error");
       return;
     }
 
-    const pesan = "Login berhasil.";
-    authMessage.innerText = pesan;
-    tampilkanPopup(pesan, "success");
+    tampilkanPopup("Login berhasil.", "success");
 
     tampilkanModeLogin();
 
-    setTimeout(async function () {
+    try {
       await muatAplikasiSetelahLogin();
-    }, 100);
+    } catch (errorMuatAplikasi) {
+      console.error("Login berhasil, tetapi dashboard gagal dimuat:", errorMuatAplikasi);
+      tampilkanPopup(
+        "Login berhasil, tetapi sebagian data dashboard gagal dimuat.",
+        "warning"
+      );
+    }
 
+  } catch (errorLogin) {
+    console.error("Error login:", errorLogin);
+    tampilkanPopup("Terjadi kesalahan saat login.", "error");
   } finally {
     setLoginLoading(false);
   }
@@ -3645,11 +3695,13 @@ async function muatDataPengeluaranDariSupabase() {
     .order("tanggal", { ascending: false });
 
   if (error) {
-    tampilkanPopup("Gagal mengambil data pengeluaran: " + error.message);
+    console.error("Gagal mengambil data pengeluaran:", error);
+    tampilkanPopup("Gagal mengambil data pengeluaran: " + error.message, "error");
+    dataPengeluaran = [];
     return;
   }
 
-  dataPengeluaran = data.map(function (item) {
+  dataPengeluaran = (data || []).map(function (item) {
     const hargaSatuan = Math.round(Number(item.harga_satuan) || 0);
     const qty = Math.round(Number(item.qty) || 1);
 
@@ -3662,11 +3714,13 @@ async function muatDataPengeluaranDariSupabase() {
     return {
       id: item.id,
       tanggal: item.tanggal,
-      nama: item.nama,
-      kategori: item.kategori,
+      nama: item.nama || "",
+      kategori: item.kategori || "Lainnya",
       harga_satuan: hargaSatuan,
       qty: qty,
-      jumlah: total
+      jumlah: total,
+      metode_pembayaran: item.metode_pembayaran || "Cash",
+      status_utang: item.status_utang || null
     };
   });
 }
@@ -4272,6 +4326,19 @@ function tampilkanSaranPintarLokal() {
   saran += `Total pengeluaran bulan dipilih: ${formatRupiah(totalBulan)}\n`;
   saran += `Rata-rata pengeluaran harian: ${formatRupiah(rataRataHarian)}\n`;
 
+  const analisisUtang = hitungAnalisisUtang();
+
+  if (analisisUtang.jumlahUtangBelumLunas > 0) {
+    saran += `\nAnalisis Utang/Bon:\n`;
+    saran += `Total utang belum lunas: ${formatRupiah(analisisUtang.totalUtangBelumLunas)}\n`;
+    saran += `Jumlah utang belum lunas: ${analisisUtang.jumlahUtangBelumLunas} transaksi\n`;
+    saran += `Rekomendasi: Prioritaskan melunasi utang/bon yang masih aktif sebelum menambah pengeluaran baru.\n\n`;
+  } else if (analisisUtang.jumlahUtangLunas > 0) {
+    saran += `\nAnalisis Utang/Bon:\n`;
+    saran += `Semua utang/bon pada periode ini sudah lunas.\n`;
+    saran += `Rekomendasi: Pertahankan kebiasaan membayar utang tepat waktu.\n\n`;
+  }
+
   const prediksiPintar = hitungPrediksiPintarAkhirBulan();
 
   if (prediksiPintar.bisaDiprediksi) {
@@ -4346,6 +4413,8 @@ async function buatSaranPintarAI() {
     return;
   }
 
+  const analisisUtang = hitungAnalisisUtang();
+
   if (!BACKEND_URL) {
     tampilkanSaranPintarLokal();
     return;
@@ -4356,7 +4425,9 @@ async function buatSaranPintarAI() {
   }, 0);
 
   const cacheKey =
-    `${filterBulan}-${filterTahun}-${dataTerfilter.length}-${totalData}-${targetBulanan}`;
+    `${filterBulan}-${filterTahun}-${dataTerfilter.length}-${totalData}-${targetBulanan}-` +
+    `${analisisUtang.totalUtangBelumLunas}-${analisisUtang.jumlahUtangBelumLunas}-` +
+    `${analisisUtang.totalUtangLunas}-${analisisUtang.jumlahUtangLunas}`;
 
   if (cacheSaranPintarAI[cacheKey]) {
     saranText.innerText = cacheSaranPintarAI[cacheKey];
@@ -4381,6 +4452,8 @@ async function buatSaranPintarAI() {
         tanggal: item.tanggal,
         nama: item.nama,
         kategori: item.kategori,
+        metode_pembayaran: item.metode_pembayaran || "Cash",
+        status_utang: item.status_utang || null,
         qty: item.qty,
         jumlah: item.jumlah
       };
@@ -4392,9 +4465,17 @@ async function buatSaranPintarAI() {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        periode: periode,
-        target_bulanan: targetBulanan,
-        data_pengeluaran: dataUntukAI
+        dataPengeluaran: dataUntukAI,
+        totalBulanIni: totalData,
+        targetBulanan: targetBulanan,
+        bulan: filterBulan,
+        tahun: filterTahun,
+        utang: {
+          total_belum_lunas: analisisUtang.totalUtangBelumLunas,
+          jumlah_belum_lunas: analisisUtang.jumlahUtangBelumLunas,
+          total_lunas: analisisUtang.totalUtangLunas,
+          jumlah_lunas: analisisUtang.jumlahUtangLunas
+        }
       })
     });
 
@@ -4983,3 +5064,64 @@ document.addEventListener("keydown", function (event) {
     tutupTentangAplikasi();
   }
 });
+
+function tampilkanStatusUtang(item) {
+  if (item.metode_pembayaran !== "Utang/Bon") {
+    return "-";
+  }
+
+  if (item.status_utang === "Lunas") {
+    return `<span class="badge-lunas">Lunas</span>`;
+  }
+
+  return `<span class="badge-belum-lunas">Belum Lunas</span>`;
+}
+
+async function lunaskanUtang(id) {
+  const yakin = await tampilkanKonfirmasi(
+    "Apakah utang/bon ini sudah lunas?",
+    "Konfirmasi Pelunasan"
+  );
+
+  if (!yakin) {
+    return;
+  }
+
+  if (modeDemoPortfolio) {
+    dataPengeluaran = dataPengeluaran.map(function (item) {
+      if (item.id === id) {
+        return {
+          ...item,
+          status_utang: "Lunas"
+        };
+      }
+
+      return item;
+    });
+
+    tampilkanData();
+    refreshTampilan();
+    tampilkanPopup("Utang demo berhasil ditandai lunas.", "success");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("expenses")
+    .update({
+      status_utang: "Lunas"
+    })
+    .eq("id", id)
+    .eq("user_id", currentUser.id);
+
+  if (error) {
+    console.error(error);
+    tampilkanPopup("Gagal memperbarui status utang.", "error");
+    return;
+  }
+
+  await muatDataPengeluaranDariSupabase();
+  tampilkanData();
+  refreshTampilan();
+
+  tampilkanPopup("Utang/bon berhasil ditandai lunas.", "success");
+}

@@ -2162,3 +2162,40 @@ input[type="password"]::-webkit-caps-lock-indicator {
   align-items: center;
   justify-content: center;
 }
+
+.badge-lunas,
+.badge-belum-lunas {
+  display: inline-flex;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.badge-lunas {
+  background: rgba(34, 197, 94, 0.14);
+  color: #86efac;
+  border: 1px solid rgba(34, 197, 94, 0.28);
+}
+
+.badge-belum-lunas {
+  background: rgba(245, 158, 11, 0.14);
+  color: #fcd34d;
+  border: 1px solid rgba(245, 158, 11, 0.28);
+}
+
+.btn-lunas {
+  width: auto !important;
+  padding: 8px 10px !important;
+  margin-right: 6px;
+  border-radius: 10px !important;
+  background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+  color: white !important;
+  font-size: 12px;
+  box-shadow: 0 10px 24px rgba(34, 197, 94, 0.22) !important;
+}
+
+.btn-lunas:hover {
+  box-shadow: 0 12px 28px rgba(34, 197, 94, 0.3) !important;
+}
