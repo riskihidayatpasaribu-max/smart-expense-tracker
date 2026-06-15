@@ -3696,7 +3696,7 @@ async function exportPDF() {
   let logoBase64 = null;
 
   try {
-    logoBase64 = await loadImageAsBase64("assets/favicon.png");
+    logoBase64 = await loadImageAsBase64("assets/logo-pdf.png");
   } catch (error) {
     console.warn("Logo PDF tidak berhasil dimuat:", error);
   }
@@ -4011,18 +4011,20 @@ async function exportPDF() {
   setButtonLoading(btnExportPDF, false);
 }
 
-function loadImageAsBase64(src) {
+function loadImageAsBase64(src, maxSize = 96) {
   return new Promise(function (resolve, reject) {
     const img = new Image();
     img.crossOrigin = "anonymous";
 
     img.onload = function () {
       const canvas = document.createElement("canvas");
-      canvas.width = img.width;
-      canvas.height = img.height;
+
+      const scale = Math.min(maxSize / img.width, maxSize / img.height, 1);
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
 
       const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
       resolve(canvas.toDataURL("image/png"));
     };
