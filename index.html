@@ -82,7 +82,7 @@
         </div>
 
         <p id="loginReminder" class="login-reminder" style="display: none;">
-          Mohon ingat username dan password Anda karena web ini tidak menyediakan fitur lupa password.
+          Catat kredensial Anda baik-baik — fitur reset password belum tersedia di aplikasi ini.
         </p>
 
         <button id="btnDemoPortfolio" type="button" class="demo-login-btn" onclick="masukModeDemoPortfolio()">
@@ -94,43 +94,51 @@
     </section>
 
     <!-- =========================
-         USER BAR
-    ========================== -->
-    <section id="userSection" class="top-user-bar" style="display: none;">
-      <div>
-        <p class="top-label">Status Akun</p>
-        <h3 id="userInfo">Belum login.</h3>
-      </div>
-
-      <button onclick="logoutUser()" class="logout-btn">Logout</button>
-    </section>
-
-    <!-- =========================
          DASHBOARD PAGE
     ========================== -->
     <div id="appSection" class="dashboard-page" style="display: none;">
       <div class="dashboard-bg"></div>
 
       <div class="floating-dashboard-nav" id="floatingDashboardNav">
-        <button type="button" class="floating-nav-toggle" onclick="toggleDashboardNav()">
+        <button type="button" class="floating-nav-toggle" onclick="toggleDashboardNav()" aria-expanded="false" aria-controls="floatingNavPanel">
           ☰ Fitur
         </button>
 
         <div class="floating-nav-panel" id="floatingNavPanel">
-          <button type="button" onclick="bukaTentangAplikasi()">Tentang Aplikasi</button>
-          <button type="button" onclick="scrollKeFitur('formPengeluaranSection')">Tambah Data</button>
-          <button type="button" onclick="scrollKeFitur('targetSection')">Target Bulanan</button>
-          <button type="button" onclick="scrollKeFitur('filterSection')">Filter</button>
-          <button type="button" onclick="scrollKeFitur('pdfSection')">Laporan PDF</button>
-          <button type="button" onclick="scrollKeFitur('ringkasanSection')">Ringkasan</button>
-          <button type="button" onclick="scrollKeFitur('analisisSection')">Analisis</button>
-          <button type="button" onclick="scrollKeFitur('saranPintarSection')">Saran Pintar</button>
-          <button type="button" onclick="scrollKeFitur('riwayatAiSection')">Riwayat Deteksi</button>
-          <button type="button" onclick="scrollKeFitur('insightItemSection')">Insight Item</button>
-          <button type="button" onclick="scrollKeFitur('grafikKategoriSection')">Grafik Kategori</button>
-          <button type="button" onclick="scrollKeFitur('ringkasanKategoriSection')">Ringkasan Kategori</button>
-          <button type="button" onclick="scrollKeFitur('grafikHarianSection')">Grafik Harian</button>
-          <button type="button" onclick="scrollKeFitur('daftarPengeluaranSection')">Daftar Data</button>
+
+          <div class="nav-group">
+            <span class="nav-group-label">Masukan</span>
+            <button type="button" onclick="scrollKeFitur('formPengeluaranSection')">Tambah Data</button>
+            <button type="button" onclick="scrollKeFitur('targetSection')">Target Bulanan</button>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-label">Analisis & AI</span>
+            <button type="button" onclick="scrollKeFitur('ringkasanSection')">Ringkasan</button>
+            <button type="button" onclick="scrollKeFitur('analisisSection')">Analisis</button>
+            <button type="button" onclick="scrollKeFitur('saranPintarSection')">Saran Pintar</button>
+            <button type="button" onclick="scrollKeFitur('riwayatAiSection')">Riwayat Deteksi</button>
+            <button type="button" onclick="scrollKeFitur('insightItemSection')">Insight Item</button>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-label">Grafik</span>
+            <button type="button" onclick="scrollKeFitur('grafikKategoriSection')">Grafik Kategori</button>
+            <button type="button" onclick="scrollKeFitur('ringkasanKategoriSection')">Ringkasan Kategori</button>
+            <button type="button" onclick="scrollKeFitur('grafikHarianSection')">Grafik Harian</button>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-label">Data & Laporan</span>
+            <button type="button" onclick="scrollKeFitur('filterSection')">Filter</button>
+            <button type="button" onclick="scrollKeFitur('daftarPengeluaranSection')">Daftar Data</button>
+            <button type="button" onclick="scrollKeFitur('pdfSection')">Laporan PDF</button>
+          </div>
+
+          <div class="nav-group nav-group--footer">
+            <button type="button" class="nav-about-btn" onclick="bukaTentangAplikasi()">Tentang Aplikasi</button>
+          </div>
+
         </div>
       </div>
 
@@ -441,6 +449,14 @@
             </p>
           </div>
 
+          <!-- User chip — dipindah dari atas ke sini agar kontekstual -->
+          <div id="userSection" class="hero-user-chip" style="display: none;">
+            <div class="hero-user-info">
+              <span class="hero-user-label">Sesi Aktif</span>
+              <span id="userInfo" class="hero-user-name">-</span>
+            </div>
+            <button onclick="logoutUser()" class="logout-btn">Logout</button>
+          </div>
         </div>
 
         <section class="card admin-only" id="adminUserControl" style="display: none;">

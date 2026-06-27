@@ -50,6 +50,19 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   pilihModeLogin("admin");
 
+  // DEV REMINDER: Pastikan Row Level Security (RLS) sudah aktif
+  // di semua tabel Supabase (expenses, profiles, dll) sebelum deploy.
+  // Tanpa RLS, user lain bisa membaca/memodifikasi data semua user.
+  if (typeof supabaseClient !== "undefined" && location.hostname !== "localhost") {
+    console.warn(
+      "%c[Smart Expense Tracker] PENGINGAT KEAMANAN",
+      "color: #f59e0b; font-weight: bold; font-size: 13px;",
+      "\nPastikan Row Level Security (RLS) sudah AKTIF di Supabase:\n" +
+      "  • Tabel: expenses, profiles\n" +
+      "  • Dashboard Supabase → Authentication → Policies\n" +
+      "Tanpa RLS, anon key yang ter-expose bisa disalahgunakan."
+    );
+  }
 
   setTanggalHariIni();
 
@@ -2949,9 +2962,10 @@ function pilihModeLogin(mode) {
 
     btnRegister.style.display = "none";
     btnLogin.innerText = "Login Admin";
+    btnLogin.dataset.mode = "admin";
 
     if (loginReminder) {
-      loginReminder.style.display = "none";
+      loginReminder.style.display = "none"; loginReminder.classList.remove("visible");
     }
 
   } else {
@@ -2964,9 +2978,10 @@ function pilihModeLogin(mode) {
     btnRegister.style.display = "block";
     btnRegister.innerText = "Register User";
     btnLogin.innerText = "Login User";
+    btnLogin.dataset.mode = "user";
 
     if (loginReminder) {
-      loginReminder.style.display = "block";
+      loginReminder.style.display = "block"; setTimeout(function(){ loginReminder.classList.add("visible"); }, 10);
     }
   }
 }
@@ -3026,7 +3041,7 @@ function pilihModeLogin(mode) {
     if (btnRegister) btnRegister.style.display = "none";
     if (btnLogin) btnLogin.innerText = "Login Admin";
 
-    if (loginReminder) loginReminder.style.display = "none";
+    if (loginReminder) loginReminder.style.display = "none"; loginReminder.classList.remove("visible");
   } else {
     if (adminLoginBox) adminLoginBox.style.display = "none";
     if (userLoginBox) userLoginBox.style.display = "block";
@@ -3041,7 +3056,7 @@ function pilihModeLogin(mode) {
 
     if (btnLogin) btnLogin.innerText = "Login User";
 
-    if (loginReminder) loginReminder.style.display = "block";
+    if (loginReminder) loginReminder.style.display = "block"; setTimeout(function(){ loginReminder.classList.add("visible"); }, 10);
   }
 }
 
@@ -3332,7 +3347,7 @@ function tampilkanModeLogin() {
   }
 
   if (userSection) {
-    userSection.style.setProperty("display", "block", "important");
+    userSection.style.setProperty("display", "flex", "important");
     userSection.classList.remove("force-hidden");
   }
 
@@ -3345,11 +3360,11 @@ function tampilkanModeLogin() {
 
   if (userInfo) {
     if (currentProfile && currentProfile.role === "admin") {
-      userInfo.innerText = "Login sebagai Admin: " + currentUser.email;
+      userInfo.innerText = "Admin · " + currentUser.email;
     } else if (currentProfile && currentProfile.username) {
-      userInfo.innerText = "Login sebagai User: " + currentProfile.username;
+      userInfo.innerText = "User · " + currentProfile.username;
     } else if (currentUser) {
-      userInfo.innerText = "Login sebagai: " + currentUser.email;
+      userInfo.innerText = currentUser.email;
     }
   }
 
@@ -4403,6 +4418,11 @@ async function buatSaranPintarAI() {
     return;
   }
 
+  // Guard: cegah double-click saat sedang loading
+  if (btnSaran && btnSaran.disabled) {
+    return;
+  }
+
   const dataTerfilter = dataPengeluaran.filter(function (item) {
     return cekDataSesuaiFilter(item);
   });
@@ -4988,7 +5008,9 @@ function toggleDashboardNav() {
     return;
   }
 
-  nav.classList.toggle("open");
+  const isOpen = nav.classList.toggle("open");
+  const toggle = nav.querySelector(".floating-nav-toggle");
+  if (toggle) toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
 }
 
 function scrollKeFitur(sectionId) {
