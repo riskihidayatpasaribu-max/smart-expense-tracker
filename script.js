@@ -720,23 +720,19 @@ async function tambahPengeluaran() {
         `Kategori yang dipilih: ${hasilBackend.kategori_final}. ` +
         `${hasilBackend.alasan}`
       );
-    }
-
-    if (hasilBackend && hasilBackend.alasan) {
-      catatRiwayatDeteksiAI(
-        namaInput,
-        hasilBackend.nama_final || namaInput,
-        hasilBackend.kategori_final || kategori,
-        hasilBackend.alasan
-      );
-    }
-
-    else {
+    } else {
       tampilkanKeteranganAI(
         `Sistem menganalisis "${namaInput}" sebagai kategori ${hasilBackend.kategori_final}. ` +
         `${hasilBackend.alasan}`
       );
     }
+
+    catatRiwayatDeteksiAI(
+      namaInput,
+      hasilBackend.nama_final || namaInput,
+      hasilBackend.kategori_final || kategori,
+      hasilBackend.alasan
+    );
   }
 
   const namaFinal = hasilBackend.nama_final || namaInput;
