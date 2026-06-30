@@ -1,394 +1,314 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>Smart Expense Tracker</title>
-
-  <link rel="icon" type="image/png" href="assets/favicon.png" />
-
-  <link rel="stylesheet" href="style.css?v=18" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=21" />
 </head>
-
 <body>
 
-  <div class="container">
-
-    <!-- =========================
-         LOGIN PAGE
-    ========================== -->
-    <section id="authSection" class="login-page">
-      <div class="login-overlay"></div>
-
-      <div class="login-card">
-        <div class="login-header">
-          <h1>Smart Expense Tracker</h1>
-          <p>Aplikasi web pengelola pengeluaran harian berbasis saran cerdas AI</p>
-        </div>
-
-        <div class="login-mode-box">
-          <button type="button" id="btnModeAdmin" class="active" onclick="pilihModeLogin('admin')">
-            Admin
-          </button>
-
-          <button type="button" id="btnModeUser" onclick="pilihModeLogin('user')">
-            User Biasa
-          </button>
-        </div>
-
-        <div id="adminLoginBox" class="login-form-box">
-          <div class="form-group">
-            <label for="emailInput">Email Admin</label>
-            <input type="email" id="emailInput" placeholder="Masukkan email admin" />
-          </div>
-
-          <div class="form-group">
-            <label for="adminPasswordInput">Password Admin</label>
-            <div class="password-wrapper">
-              <input type="password" id="adminPasswordInput" placeholder="Masukkan password admin" />
-              <button type="button" class="eye-btn" onclick="togglePassword('adminPasswordInput', this)"
-                aria-label="Tampilkan password">
-                👁
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div id="userLoginBox" class="login-form-box" style="display: none;">
-          <div class="form-group">
-            <label for="usernameInput">Username</label>
-            <input type="text" id="usernameInput" placeholder="Masukkan username" />
-          </div>
-
-          <div class="form-group">
-            <label for="userPasswordInput">Password</label>
-            <div class="password-wrapper">
-              <input type="password" id="userPasswordInput" placeholder="Masukkan password user" />
-              <button type="button" class="eye-btn" onclick="togglePassword('userPasswordInput', this)"
-                aria-label="Tampilkan password">
-                👁
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="auth-row login-action-row">
-          <button id="btnRegister" type="button" onclick="registerUser()" style="display: none;">
-            Register User
-          </button>
-          <button id="btnLogin" type="button" onclick="loginUser()">Login Admin</button>
-        </div>
-
-        <p id="loginReminder" class="login-reminder" style="display: none;">
-          Catat kredensial Anda baik-baik — fitur reset password belum tersedia di aplikasi ini.
-        </p>
-
-        <button id="btnDemoPortfolio" type="button" class="demo-login-btn" onclick="masukModeDemoPortfolio()">
-          Masuk Mode Demo Portfolio
-        </button>
-
-        <p id="authMessage" class="login-message"></p>
+  <!-- ================================
+       LOGIN PAGE
+  ================================= -->
+  <section id="authSection" class="login-page">
+    <div class="login-overlay"></div>
+    <div class="login-card">
+      <div class="login-logo">
+        <span class="login-logo-text">Smart<strong>Expense</strong></span>
       </div>
-    </section>
+      <p class="login-tagline">Pengelola keuangan cerdas berbasis AI</p>
 
-    <!-- =========================
-         DASHBOARD PAGE
-    ========================== -->
-    <div id="appSection" class="dashboard-page" style="display: none;">
-      <div class="dashboard-bg"></div>
+      <div class="login-mode-box">
+        <button type="button" id="btnModeAdmin" class="active" onclick="pilihModeLogin('admin')">Admin</button>
+        <button type="button" id="btnModeUser" onclick="pilihModeLogin('user')">User</button>
+      </div>
 
-      <div class="floating-dashboard-nav" id="floatingDashboardNav">
-        <button type="button" class="floating-nav-toggle" onclick="toggleDashboardNav()" aria-expanded="false" aria-controls="floatingNavPanel">
-          ☰ Fitur
-        </button>
-
-        <div class="floating-nav-panel" id="floatingNavPanel">
-
-          <div class="nav-group">
-            <span class="nav-group-label">Masukan</span>
-            <button type="button" onclick="scrollKeFitur('formPengeluaranSection')">Tambah Data</button>
-            <button type="button" onclick="scrollKeFitur('targetSection')">Target Bulanan</button>
+      <div id="adminLoginBox" class="login-form-box">
+        <div class="form-group">
+          <label for="emailInput">Email Admin</label>
+          <input type="email" id="emailInput" placeholder="admin@email.com" />
+        </div>
+        <div class="form-group">
+          <label for="adminPasswordInput">Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="adminPasswordInput" placeholder="••••••••" />
+            <button type="button" class="eye-btn" onclick="togglePassword('adminPasswordInput', this)">Lihat</button>
           </div>
-
-          <div class="nav-group">
-            <span class="nav-group-label">Analisis & AI</span>
-            <button type="button" onclick="scrollKeFitur('ringkasanSection')">Ringkasan</button>
-            <button type="button" onclick="scrollKeFitur('analisisSection')">Analisis</button>
-            <button type="button" onclick="scrollKeFitur('saranPintarSection')">Saran Pintar</button>
-            <button type="button" onclick="scrollKeFitur('riwayatAiSection')">Riwayat Deteksi</button>
-            <button type="button" onclick="scrollKeFitur('insightItemSection')">Insight Item</button>
-          </div>
-
-          <div class="nav-group">
-            <span class="nav-group-label">Grafik</span>
-            <button type="button" onclick="scrollKeFitur('grafikKategoriSection')">Grafik Kategori</button>
-            <button type="button" onclick="scrollKeFitur('ringkasanKategoriSection')">Ringkasan Kategori</button>
-            <button type="button" onclick="scrollKeFitur('grafikHarianSection')">Grafik Harian</button>
-          </div>
-
-          <div class="nav-group">
-            <span class="nav-group-label">Data & Laporan</span>
-            <button type="button" onclick="scrollKeFitur('filterSection')">Filter</button>
-            <button type="button" onclick="scrollKeFitur('daftarPengeluaranSection')">Daftar Data</button>
-            <button type="button" onclick="scrollKeFitur('pdfSection')">Laporan PDF</button>
-          </div>
-
-          <div class="nav-group nav-group--footer">
-            <button type="button" class="nav-about-btn" onclick="bukaTentangAplikasi()">Tentang Aplikasi</button>
-          </div>
-
         </div>
       </div>
 
-      <div class="dashboard-container">
+      <div id="userLoginBox" class="login-form-box" style="display: none;">
+        <div class="form-group">
+          <label for="usernameInput">Username</label>
+          <input type="text" id="usernameInput" placeholder="Masukkan username" />
+        </div>
+        <div class="form-group">
+          <label for="userPasswordInput">Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="userPasswordInput" placeholder="••••••••" />
+            <button type="button" class="eye-btn" onclick="togglePassword('userPasswordInput', this)">Lihat</button>
+          </div>
+        </div>
+      </div>
 
-        <div class="admin-tab-menu" id="adminTabMenu" style="display: none;">
-          <button type="button" id="btnTabDashboard" class="admin-tab-btn active" onclick="bukaTabAdmin('dashboard')">
-            Dashboard Pengeluaran
-          </button>
+      <div class="login-action-row">
+        <button id="btnRegister" type="button" onclick="registerUser()" style="display: none;">Register</button>
+        <button id="btnLogin" type="button" onclick="loginUser()">Login</button>
+      </div>
 
-          <button type="button" id="btnTabUser" class="admin-tab-btn" onclick="bukaTabAdmin('user')">
-            Kontrol User
-          </button>
+      <p id="loginReminder" class="login-reminder" style="display: none;">
+        Catat kredensial Anda — reset password belum tersedia.
+      </p>
+
+      <button id="btnDemoPortfolio" type="button" class="demo-login-btn" onclick="masukModeDemoPortfolio()">
+        Masuk Mode Demo
+      </button>
+
+      <p id="authMessage" class="login-message"></p>
+    </div>
+  </section>
+
+  <!-- ================================
+       MAIN APP (Dashboard)
+  ================================= -->
+  <div id="appSection" style="display: none;">
+  <div class="app-shell">
+
+    <!-- SIDEBAR OVERLAY (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <span class="sidebar-brand-name">Smart<strong>Expense</strong></span>
+        </div>
+        <button class="sidebar-close-btn" onclick="toggleSidebar()">Tutup</button>
+      </div>
+
+      <!-- User chip -->
+      <div id="sidebarUserChip" class="sidebar-user-chip" style="display:none;">
+        <div class="sidebar-user-avatar" id="sidebarUserAvatar">A</div>
+        <div class="sidebar-user-info">
+          <span class="sidebar-user-label">Sesi Aktif</span>
+          <span id="sidebarUserName" class="sidebar-user-name">-</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <span class="nav-section-label">DASHBOARD</span>
+          <a class="nav-item" data-section="ringkasanSection" onclick="scrollKeFitur('ringkasanSection'); closeSidebarMobile()">
+            Ringkasan
+          </a>
+          <a class="nav-item" data-section="analisisSection" onclick="scrollKeFitur('analisisSection'); closeSidebarMobile()">
+            Analisis
+          </a>
+          <a class="nav-item" data-section="grafikKategoriSection" onclick="scrollKeFitur('grafikKategoriSection'); closeSidebarMobile()">
+            Grafik Kategori
+          </a>
+          <a class="nav-item" data-section="grafikHarianSection" onclick="scrollKeFitur('grafikHarianSection'); closeSidebarMobile()">
+            Grafik Harian
+          </a>
         </div>
 
-        <div id="dashboardContent">
+        <div class="nav-section">
+          <span class="nav-section-label">INPUT DATA</span>
+          <a class="nav-item" data-section="formPengeluaranSection" onclick="scrollKeFitur('formPengeluaranSection'); closeSidebarMobile()">
+            Tambah Data
+          </a>
+          <a class="nav-item" data-section="targetSection" onclick="scrollKeFitur('targetSection'); closeSidebarMobile()">
+            Target Bulanan
+          </a>
+        </div>
 
+        <div class="nav-section">
+          <span class="nav-section-label">AI & ANALISIS</span>
+          <a class="nav-item" data-section="saranPintarSection" onclick="scrollKeFitur('saranPintarSection'); closeSidebarMobile()">
+            Saran Pintar AI
+          </a>
+          <a class="nav-item" data-section="riwayatAiSection" onclick="scrollKeFitur('riwayatAiSection'); closeSidebarMobile()">
+            Riwayat Deteksi
+          </a>
+          <a class="nav-item" data-section="insightItemSection" onclick="scrollKeFitur('insightItemSection'); closeSidebarMobile()">
+            Insight Item
+          </a>
+        </div>
 
-          <section id="formPengeluaranSection" class="card">
-            <h2>Tambah Pengeluaran</h2>
+        <div class="nav-section">
+          <span class="nav-section-label">DATA & LAPORAN</span>
+          <a class="nav-item" data-section="filterSection" onclick="scrollKeFitur('filterSection'); closeSidebarMobile()">
+            Filter Data
+          </a>
+          <a class="nav-item" data-section="ringkasanKategoriSection" onclick="scrollKeFitur('ringkasanKategoriSection'); closeSidebarMobile()">
+            Ringkasan Kategori
+          </a>
+          <a class="nav-item" data-section="daftarPengeluaranSection" onclick="scrollKeFitur('daftarPengeluaranSection'); closeSidebarMobile()">
+            Daftar Data
+          </a>
+          <a class="nav-item" data-section="pdfSection" onclick="scrollKeFitur('pdfSection'); closeSidebarMobile()">
+            Laporan PDF
+          </a>
+        </div>
+      </nav>
 
-            <div class="form-group">
-              <label for="tanggal">Tanggal</label>
-              <input type="date" id="tanggal" />
+      <div class="sidebar-footer">
+        <button class="sidebar-about-btn" onclick="bukaTentangAplikasi()">Tentang Aplikasi</button>
+        <button id="btnSidebarLogout" class="sidebar-logout-btn" onclick="logoutUser()" style="display:none;">Logout</button>
+        <!-- Hidden bridge: script.js toggles this element's display as part of login/logout flow.
+             It has no visual role here; our own script (below) drives the real logout button. -->
+        <span id="userSection" style="display:none;"></span>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content" id="mainContent">
+
+      <!-- TOP NAVBAR -->
+      <header class="topbar">
+        <button class="topbar-menu-btn" onclick="toggleSidebar()" aria-label="Toggle Sidebar">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="topbar-title">
+          <h1>Dashboard Keuangan</h1>
+          <span class="topbar-breadcrumb">Home › Dashboard</span>
+        </div>
+        <div class="topbar-right">
+          <span id="topbarUserInfo" class="topbar-user"></span>
+        </div>
+      </header>
+
+      <!-- Hidden bridge: script.js writes the logged-in user's display text here.
+           Our own script (bottom of file) mirrors it into the sidebar chip and topbar. -->
+      <span id="userInfo" style="display:none;"></span>
+
+      <!-- ADMIN TABS -->
+      <div class="admin-tab-menu" id="adminTabMenu" style="display: none;">
+        <button type="button" id="btnTabDashboard" class="admin-tab-btn active" onclick="bukaTabAdmin('dashboard')">
+          Dashboard Pengeluaran
+        </button>
+        <button type="button" id="btnTabUser" class="admin-tab-btn" onclick="bukaTabAdmin('user')">
+          Kontrol User
+        </button>
+      </div>
+
+      <div id="dashboardContent">
+        <div class="dashboard-scroll">
+
+        <!-- ======== SUMMARY CARDS ======== -->
+        <section id="ringkasanSection" class="summary-grid">
+          <div class="kpi-card kpi-blue">
+            <div class="kpi-body">
+              <span class="kpi-label">Total Hari Ini</span>
+              <p class="kpi-value" id="totalHariIni">Rp0</p>
+              <span class="kpi-sub">Pengeluaran hari ini</span>
             </div>
-
-            <div class="form-group">
-              <label for="nama">Nama Pengeluaran</label>
-              <input type="text" id="nama" placeholder="Contoh: Nasi goreng" />
+          </div>
+          <div class="kpi-card kpi-green">
+            <div class="kpi-body">
+              <span class="kpi-label">Total Bulan Ini</span>
+              <p class="kpi-value" id="totalBulanIni">Rp0</p>
+              <span class="kpi-sub">Akumulasi bulan berjalan</span>
             </div>
-
-            <div class="form-group">
-              <label for="hargaSatuan">Harga Satuan</label>
-              <input type="number" id="hargaSatuan" placeholder="Contoh: 5000" />
+          </div>
+          <div class="kpi-card kpi-orange">
+            <div class="kpi-body">
+              <span class="kpi-label">Prediksi Akhir Bulan</span>
+              <p class="kpi-value" id="prediksiBulan">Rp0</p>
+              <span class="kpi-sub">Berdasarkan tren harian</span>
             </div>
-
-            <div class="form-group">
-              <label for="qty">Jumlah Item</label>
-              <input type="number" id="qty" placeholder="Contoh: 2" min="1" value="1" />
+          </div>
+          <div class="kpi-card kpi-red">
+            <div class="kpi-body">
+              <span class="kpi-label">Sisa Target</span>
+              <p class="kpi-value" id="sisaTarget">-</p>
+              <span class="kpi-sub">Dari target bulanan</span>
             </div>
+          </div>
+        </section>
 
-            <div class="form-group">
-              <label for="kategori">Kategori</label>
-              <select id="kategori">
-                <option value="Makanan">Makanan</option>
-                <option value="Transportasi">Transportasi</option>
-                <option value="Internet">Internet</option>
-                <option value="Belanja">Belanja</option>
-                <option value="Pendidikan">Pendidikan</option>
-                <option value="Kesehatan">Kesehatan</option>
-                <option value="Hiburan">Hiburan</option>
-                <option value="Tagihan">Tagihan</option>
-                <option value="Lainnya">Lainnya</option>
-              </select>
+        <!-- ======== CHART ROW ======== -->
+        <div class="charts-row">
+          <section id="grafikKategoriSection" class="card chart-card">
+            <div class="card-header">
+              <h2>Pengeluaran per Kategori</h2>
+              <span class="card-badge">Bulan Ini</span>
             </div>
-
-            <div class="form-group">
-              <label for="metodePembayaran">Metode Pembayaran</label>
-              <select id="metodePembayaran">
-                <option value="Cash">Cash</option>
-                <option value="Saldo">Saldo</option>
-                <option value="Utang/Bon">Utang/Bon</option>
-              </select>
-            </div>
-
-            <button id="btnSimpan" onclick="simpanPengeluaran()">Tambah Data</button>
-
-            <div id="aiInfoBox" class="ai-info-box" style="display: none;">
-              <div class="ai-info-title">Keterangan Deteksi</div>
-              <div id="aiInfoText" class="ai-info-text">
-                Belum ada keterangan.
-              </div>
-            </div>
-
-            <button id="btnBatalEdit" class="secondary-btn" onclick="batalEdit()" style="display: none;">
-              Batal Edit
-            </button>
-          </section>
-
-          <section id="targetSection" class="card">
-            <h2>Target Pengeluaran Bulanan</h2>
-
-            <div class="form-group">
-              <label for="targetBulanan">Batas Pengeluaran Bulanan</label>
-              <input type="number" id="targetBulanan" placeholder="Contoh: 1500000" />
-            </div>
-
-            <button onclick="simpanTargetBulanan()">Simpan Target</button>
-
-            <p id="targetInfo" class="info-text">Belum ada target bulanan.</p>
-          </section>
-
-          <section id="filterSection" class="card">
-            <h2>Filter Data</h2>
-
-            <div class="filter-row">
-              <div class="form-group">
-                <label for="filterBulan">Bulan</label>
-                <select id="filterBulan">
-                  <option value="1">Januari</option>
-                  <option value="2">Februari</option>
-                  <option value="3">Maret</option>
-                  <option value="4">April</option>
-                  <option value="5">Mei</option>
-                  <option value="6">Juni</option>
-                  <option value="7">Juli</option>
-                  <option value="8">Agustus</option>
-                  <option value="9">September</option>
-                  <option value="10">Oktober</option>
-                  <option value="11">November</option>
-                  <option value="12">Desember</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="filterTahun">Tahun</label>
-                <input type="number" id="filterTahun" placeholder="Contoh: 2026" />
-              </div>
-            </div>
-
-            <button onclick="terapkanFilter()">Terapkan Filter</button>
-
-            <p id="filterInfo" class="info-text">Menampilkan data bulan ini.</p>
-          </section>
-
-          <section id="pdfSection" class="card">
-            <h2>Laporan PDF</h2>
-
-            <p class="info-text">
-              Export laporan pengeluaran berdasarkan bulan dan tahun yang sedang difilter.
-            </p>
-
-            <button id="btnExportPDF" onclick="exportPDF()">Export ke PDF</button>
-          </section>
-
-          <section id="ringkasanSection" class="summary">
-            <div class="summary-card">
-              <h3>Total Hari Ini</h3>
-              <p id="totalHariIni">Rp0</p>
-            </div>
-
-            <div class="summary-card">
-              <h3>Total Bulan Ini</h3>
-              <p id="totalBulanIni">Rp0</p>
-            </div>
-
-            <div class="summary-card">
-              <h3>Prediksi Akhir Bulan</h3>
-              <p id="prediksiBulan">Rp0</p>
-            </div>
-          </section>
-
-          <section id="analisisSection" class="card">
-            <h2>Analisis Pengeluaran</h2>
-            <p id="analisisText">Belum ada data untuk dianalisis.</p>
-          </section>
-
-          <section id="saranPintarSection" class="card smart-card">
-            <h2>Saran Pintar</h2>
-
-            <p id="saranPintarText">
-              Klik tombol di bawah untuk membuat saran pintar berdasarkan data pengeluaran bulan ini.
-            </p>
-
-            <button type="button" id="btnSaranPintar" onclick="buatSaranPintarAI()">
-              Buat Saran Pintar
-            </button>
-          </section>
-
-          <section id="riwayatAiSection" class="card smart-card">
-            <h2>Riwayat Deteksi Cerdas</h2>
-
-            <p class="info-text">
-              Bagian ini menampilkan riwayat koreksi nama pengeluaran, deteksi typo, dan kategori yang dipilih sistem.
-            </p>
-
-            <div class="table-responsive">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Waktu</th>
-                    <th>Input Awal</th>
-                    <th>Hasil Deteksi</th>
-                    <th>Kategori</th>
-                    <th>Keterangan</th>
-                  </tr>
-                </thead>
-
-                <tbody id="tabelRiwayatAI">
-                  <tr>
-                    <td colspan="5">Belum ada riwayat deteksi.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          <section id="insightItemSection" class="card smart-card">
-            <h2>Insight Item Sering Dibeli</h2>
-            <div id="insightItemText">Belum ada data item untuk dianalisis.</div>
-          </section>
-
-          <section id="grafikKategoriSection" class="card">
-            <h2>Grafik Pengeluaran per Kategori</h2>
-            <div class="chart-box">
+            <div class="chart-box chart-box--pie">
               <canvas id="grafikKategori"></canvas>
             </div>
           </section>
 
-          <section id="ringkasanKategoriSection" class="card">
-            <h2>Ringkasan Kategori</h2>
-
-            <div class="table-responsive">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Kategori</th>
-                    <th>Total</th>
-                    <th>Persentase</th>
-                  </tr>
-                </thead>
-
-                <tbody id="tabelRingkasanKategori">
-                  <!-- Ringkasan kategori muncul di sini -->
-                </tbody>
-              </table>
+          <section id="grafikHarianSection" class="card chart-card">
+            <div class="card-header">
+              <h2>Tren Pengeluaran Harian</h2>
+              <span class="card-badge">30 Hari</span>
             </div>
-          </section>
-
-          <section id="grafikHarianSection" class="card">
-            <h2>Grafik Pengeluaran Harian</h2>
-            <div class="chart-box">
+            <div class="chart-box chart-box--bar">
               <canvas id="grafikHarian"></canvas>
             </div>
           </section>
+        </div>
 
-          <section id="daftarPengeluaranSection" class="card">
-            <h2>Daftar Pengeluaran</h2>
+        <!-- ======== ANALISIS + SARAN ROW ======== -->
+        <div class="two-col-row">
+          <section id="analisisSection" class="card">
+            <div class="card-header">
+              <h2>Analisis Pengeluaran</h2>
+              <span class="card-badge card-badge--info">Auto</span>
+            </div>
+            <p id="analisisText" class="info-text">Belum ada data untuk dianalisis.</p>
+          </section>
 
-            <div class="table-filter">
+          <section id="saranPintarSection" class="card card--ai">
+            <div class="card-header">
+              <h2>Saran Pintar AI</h2>
+              <span class="card-badge card-badge--ai">Gemini</span>
+            </div>
+            <p id="saranPintarText">Klik tombol untuk membuat saran pintar berdasarkan pengeluaran bulan ini.</p>
+            <button type="button" id="btnSaranPintar" class="btn-ai" onclick="buatSaranPintarAI()">
+              Buat Saran Pintar
+            </button>
+          </section>
+        </div>
+
+        <!-- ======== INPUT + TARGET ROW ======== -->
+        <div class="two-col-row">
+          <section id="formPengeluaranSection" class="card">
+            <div class="card-header">
+              <h2>Tambah Pengeluaran</h2>
+            </div>
+
+            <div class="form-row">
               <div class="form-group">
-                <label for="searchInput">Cari Pengeluaran</label>
-                <input type="text" id="searchInput" placeholder="Contoh: kopi, bensin, rinso"
-                  oninput="tampilkanData()" />
+                <label for="tanggal">Tanggal</label>
+                <input type="date" id="tanggal" />
               </div>
-
               <div class="form-group">
-                <label for="filterKategori">Filter Kategori</label>
-                <select id="filterKategori" onchange="tampilkanData()">
-                  <option value="Semua">Semua Kategori</option>
+                <label for="nama">Nama Pengeluaran</label>
+                <input type="text" id="nama" placeholder="Contoh: Nasi goreng" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="hargaSatuan">Harga Satuan</label>
+                <input type="number" id="hargaSatuan" placeholder="5000" />
+              </div>
+              <div class="form-group">
+                <label for="qty">Jumlah (Qty)</label>
+                <input type="number" id="qty" placeholder="1" min="1" value="1" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="kategori">Kategori</label>
+                <select id="kategori">
                   <option value="Makanan">Makanan</option>
                   <option value="Transportasi">Transportasi</option>
                   <option value="Internet">Internet</option>
@@ -400,217 +320,513 @@
                   <option value="Lainnya">Lainnya</option>
                 </select>
               </div>
-
               <div class="form-group">
-                <label for="sortData">Urutkan Data</label>
-                <select id="sortData" onchange="tampilkanData()">
-                  <option value="terbaru">Tanggal Terbaru</option>
-                  <option value="terlama">Tanggal Terlama</option>
-                  <option value="terbesar">Jumlah Terbesar</option>
-                  <option value="terkecil">Jumlah Terkecil</option>
-                  <option value="nama_az">Nama A-Z</option>
-                  <option value="nama_za">Nama Z-A</option>
+                <label for="metodePembayaran">Metode Bayar</label>
+                <select id="metodePembayaran">
+                  <option value="Cash">Cash</option>
+                  <option value="Saldo">Saldo</option>
+                  <option value="Utang/Bon">Utang/Bon</option>
                 </select>
               </div>
             </div>
 
+            <button id="btnSimpan" class="btn-primary" onclick="simpanPengeluaran()">Simpan Pengeluaran</button>
+
+            <div id="aiInfoBox" class="ai-info-box" style="display: none;">
+              <div class="ai-info-title">Keterangan Deteksi</div>
+              <div id="aiInfoText" class="ai-info-text">Belum ada keterangan.</div>
+            </div>
+
+            <button id="btnBatalEdit" class="btn-secondary" onclick="batalEdit()" style="display: none;">Batal Edit</button>
+          </section>
+
+          <div class="side-stack">
+            <section id="targetSection" class="card">
+              <div class="card-header">
+                <h2>Target Bulanan</h2>
+              </div>
+              <div class="form-group">
+                <label for="targetBulanan">Batas Pengeluaran</label>
+                <input type="number" id="targetBulanan" placeholder="Contoh: 1500000" />
+              </div>
+              <button class="btn-primary" onclick="simpanTargetBulanan()">Simpan Target</button>
+              <p id="targetInfo" class="info-text">Belum ada target bulanan.</p>
+            </section>
+
+            <section id="filterSection" class="card">
+              <div class="card-header">
+                <h2>Filter Data</h2>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="filterBulan">Bulan</label>
+                  <select id="filterBulan">
+                    <option value="1">Januari</option><option value="2">Februari</option>
+                    <option value="3">Maret</option><option value="4">April</option>
+                    <option value="5">Mei</option><option value="6">Juni</option>
+                    <option value="7">Juli</option><option value="8">Agustus</option>
+                    <option value="9">September</option><option value="10">Oktober</option>
+                    <option value="11">November</option><option value="12">Desember</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="filterTahun">Tahun</label>
+                  <input type="number" id="filterTahun" placeholder="2026" />
+                </div>
+              </div>
+              <button class="btn-primary" onclick="terapkanFilter()">Terapkan Filter</button>
+              <p id="filterInfo" class="info-text">Menampilkan data bulan ini.</p>
+            </section>
+
+            <section id="pdfSection" class="card">
+              <div class="card-header">
+                <h2>Laporan PDF</h2>
+              </div>
+              <p class="info-text">Export laporan pengeluaran berdasarkan bulan & tahun aktif.</p>
+              <button id="btnExportPDF" class="btn-primary" onclick="exportPDF()">Export ke PDF</button>
+            </section>
+          </div>
+        </div>
+
+        <!-- ======== RINGKASAN KATEGORI ======== -->
+        <section id="ringkasanKategoriSection" class="card">
+          <div class="card-header">
+            <h2>Ringkasan Kategori</h2>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Kategori</th>
+                  <th>Total</th>
+                  <th>Persentase</th>
+                </tr>
+              </thead>
+              <tbody id="tabelRingkasanKategori"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ======== AI SECTION ROW ======== -->
+        <div class="two-col-row">
+          <section id="riwayatAiSection" class="card card--ai">
+            <div class="card-header">
+              <h2>Riwayat Deteksi Cerdas</h2>
+            </div>
+            <p class="info-text">Riwayat koreksi nama, deteksi typo, dan kategori yang dipilih sistem.</p>
             <div class="table-responsive">
               <table>
                 <thead>
                   <tr>
-                    <th>Tanggal</th>
-                    <th>Nama</th>
-                    <th>Kategori</th>
-                    <th>Metode</th>
-                    <th>Status Utang</th>
-                    <th>Harga Satuan</th>
-                    <th>Qty</th>
-                    <th>Total</th>
-                    <th>Aksi</th>
+                    <th>Waktu</th><th>Input Awal</th><th>Hasil</th><th>Kategori</th><th>Ket.</th>
                   </tr>
                 </thead>
-
-                <tbody id="tabelPengeluaran">
-                  <!-- Data akan muncul di sini -->
+                <tbody id="tabelRiwayatAI">
+                  <tr><td colspan="5">Belum ada riwayat.</td></tr>
                 </tbody>
               </table>
             </div>
           </section>
 
-
+          <section id="insightItemSection" class="card card--ai">
+            <div class="card-header">
+              <h2>Insight Item</h2>
+            </div>
+            <div id="insightItemText" class="info-text">Belum ada data item untuk dianalisis.</div>
+          </section>
         </div>
 
-        <div class="dashboard-hero">
-          <div>
-            <p class="hero-kicker">Personal Finance Dashboard</p>
-            <h1>Smart Expense Tracker</h1>
-            <p>
-              Pantau pengeluaran harian, target bulanan, kategori belanja, dan ringkasan keuangan dalam satu tampilan.
-            </p>
+        <!-- ======== DAFTAR PENGELUARAN ======== -->
+        <section id="daftarPengeluaranSection" class="card">
+          <div class="card-header">
+            <h2>Daftar Pengeluaran</h2>
           </div>
 
-          <!-- User chip — dipindah dari atas ke sini agar kontekstual -->
-          <div id="userSection" class="hero-user-chip" style="display: none;">
-            <div class="hero-user-info">
-              <span class="hero-user-label">Sesi Aktif</span>
-              <span id="userInfo" class="hero-user-name">-</span>
-            </div>
-            <button onclick="logoutUser()" class="logout-btn">Logout</button>
-          </div>
-        </div>
-
-        <section class="card admin-only" id="adminUserControl" style="display: none;">
-          <h2>Kontrol User</h2>
-
-          <p class="info-text">
-            Menu ini hanya tampil untuk admin. Admin dapat menambahkan user baru, melihat daftar user, dan mengatur
-            status akun.
-          </p>
-
-          <div class="admin-user-form">
+          <div class="table-filter">
             <div class="form-group">
-              <label for="adminNewUsername">Username User Baru</label>
-              <input type="text" id="adminNewUsername" placeholder="Contoh: user1" />
+              <label for="searchInput">Cari</label>
+              <input type="text" id="searchInput" placeholder="kopi, bensin, rinso..." oninput="tampilkanData()" />
             </div>
-
             <div class="form-group">
-              <label for="adminNewPassword">Password User Baru</label>
-              <input type="password" id="adminNewPassword" placeholder="Minimal 6 karakter" />
+              <label for="filterKategori">Kategori</label>
+              <select id="filterKategori" onchange="tampilkanData()">
+                <option value="Semua">Semua</option>
+                <option value="Makanan">Makanan</option><option value="Transportasi">Transportasi</option>
+                <option value="Internet">Internet</option><option value="Belanja">Belanja</option>
+                <option value="Pendidikan">Pendidikan</option><option value="Kesehatan">Kesehatan</option>
+                <option value="Hiburan">Hiburan</option><option value="Tagihan">Tagihan</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
             </div>
-
-            <button onclick="tambahUserOlehAdmin()">Tambah User</button>
+            <div class="form-group">
+              <label for="sortData">Urutkan</label>
+              <select id="sortData" onchange="tampilkanData()">
+                <option value="terbaru">Terbaru</option>
+                <option value="terlama">Terlama</option>
+                <option value="terbesar">Terbesar</option>
+                <option value="terkecil">Terkecil</option>
+                <option value="nama_az">Nama A–Z</option>
+                <option value="nama_za">Nama Z–A</option>
+              </select>
+            </div>
           </div>
 
           <div class="table-responsive">
             <table>
               <thead>
                 <tr>
-                  <th>Username</th>
-                  <th>Email Internal</th>
-                  <th>Role</th>
-                  <th>Status</th>
-                  <th>Dibuat</th>
-                  <th>Aksi</th>
+                  <th>Tanggal</th><th>Nama</th><th>Kategori</th><th>Metode</th>
+                  <th>Status</th><th>Satuan</th><th>Qty</th><th>Total</th><th>Aksi</th>
                 </tr>
               </thead>
-
-              <tbody id="tabelKontrolUser">
-                <tr>
-                  <td colspan="6">Belum ada data user.</td>
-                </tr>
-              </tbody>
+              <tbody id="tabelPengeluaran"></tbody>
             </table>
           </div>
         </section>
 
+      </div><!-- /.dashboard-scroll -->
+      </div><!-- /#dashboardContent -->
 
+      <!-- ======== ADMIN: USER CONTROL ========
+           Sengaja di luar #dashboardContent: script.js men-set
+           dashboardContent.style.display = "none" saat tab "Kontrol User"
+           aktif, jadi section ini harus jadi sibling, bukan child —
+           kalau tetap di dalam, display:block di sini akan tetap
+           tersembunyi karena parent-nya none. -->
+      <div class="dashboard-scroll">
+        <section class="card admin-only" id="adminUserControl" style="display: none;">
+          <div class="card-header">
+            <h2>Kontrol User</h2>
+          </div>
+          <p class="info-text">Hanya admin yang bisa mengakses menu ini.</p>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="adminNewUsername">Username Baru</label>
+              <input type="text" id="adminNewUsername" placeholder="user1" />
+            </div>
+            <div class="form-group">
+              <label for="adminNewPassword">Password Baru</label>
+              <input type="password" id="adminNewPassword" placeholder="Min. 6 karakter" />
+            </div>
+          </div>
+          <button class="btn-primary" onclick="tambahUserOlehAdmin()">Tambah User</button>
+          <div class="table-responsive" style="margin-top:16px;">
+            <table>
+              <thead>
+                <tr><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Dibuat</th><th>Aksi</th></tr>
+              </thead>
+              <tbody id="tabelKontrolUser">
+                <tr><td colspan="6">Belum ada data user.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div><!-- /.dashboard-scroll (admin user control) -->
+
+    </div><!-- /.main-content -->
+  </div><!-- /.app-shell -->
+  </div><!-- /#appSection -->
+
+  <!-- ================================
+       MODALS
+  ================================= -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <div id="confirmModal" class="modal-backdrop">
+    <div class="modal-box">
+      <h3 id="confirmTitle">Konfirmasi</h3>
+      <p id="confirmMessage">Apakah kamu yakin?</p>
+      <div class="modal-actions">
+        <button type="button" id="confirmCancelBtn" class="btn-secondary">Batal</button>
+        <button type="button" id="confirmOkBtn" class="btn-danger">Lanjutkan</button>
       </div>
     </div>
-
   </div>
 
+  <div id="aboutModal" class="modal-backdrop">
+    <div class="modal-box modal-box--about">
+      <button type="button" class="modal-close-btn" onclick="tutupTentangAplikasi()">Tutup</button>
+      <div class="about-header">
+        <p class="about-kicker">Project Portfolio</p>
+        <h2>Smart Expense Tracker</h2>
+        <p>Aplikasi pintar berbasis web untuk mencatat, menganalisis, dan mengelola pengeluaran harian.</p>
+      </div>
+      <div class="about-grid">
+        <div><strong>Login Admin & User</strong><span>Akses terpisah untuk admin dan user biasa.</span></div>
+        <div><strong>Analisis Pengeluaran</strong><span>Harian, bulanan, rata-rata, target, dan pola.</span></div>
+        <div><strong>Deteksi Cerdas AI</strong><span>Deteksi typo nama dan saran kategori otomatis.</span></div>
+        <div><strong>Export PDF</strong><span>Laporan pengeluaran bulanan siap cetak.</span></div>
+      </div>
+      <div class="about-meta">
+        <div><span>Versi</span><strong>Prototype v19.0</strong></div>
+        <div><span>Developer</span><strong>Riski Hidayat Pasaribu</strong></div>
+        <div><span>Stack</span><strong>HTML · CSS · JS · Supabase · Gemini AI</strong></div>
+        <div><span>Deploy</span><strong>GitHub Pages + Supabase</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================
+       LIBRARIES
+  ================================= -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
   <!-- =========================
-       LIBRARY
+       SEMI-3D CHART PLUGIN
+       Menambahkan efek shadow + sedikit kemiringan pada doughnut/bar chart
+       tanpa mengubah satu baris pun di script.js. Chart.js tidak punya 3D
+       asli, jadi ini dibuat dengan layering shadow + radial gradient untuk
+       memberi kesan kedalaman, sambil tetap ringan & interaktif.
   ========================== -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    if (window.Chart) {
+      const semiTilt3DPlugin = {
+        id: 'semiTilt3D',
+        beforeDraw(chart) {
+          const { ctx } = chart;
+          ctx.save();
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+          ctx.shadowBlur = 18;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 10;
+        },
+        afterDraw(chart) {
+          chart.ctx.restore();
+        }
+      };
+
+      Chart.register(semiTilt3DPlugin);
+
+      // Default styling tweaks applied globally — gives doughnut slices a
+      // subtle raised, beveled look (semi-3D) and slightly rounder bars.
+      Chart.defaults.elements.arc.borderWidth = 2;
+      Chart.defaults.elements.arc.borderColor = 'rgba(13, 17, 23, 0.9)';
+      Chart.defaults.elements.arc.hoverOffset = 10;
+      Chart.defaults.elements.bar.borderRadius = 6;
+      Chart.defaults.elements.bar.borderSkipped = false;
+      Chart.defaults.font.family = "'Inter', sans-serif";
+
+      // Default color palette matching the new dashboard theme, applied to
+      // any dataset that doesn't already specify backgroundColor.
+      Chart.defaults.plugins.legend.labels.usePointStyle = true;
+      Chart.defaults.plugins.legend.labels.padding = 14;
+      Chart.defaults.plugins.tooltip.backgroundColor = '#1c2330';
+      Chart.defaults.plugins.tooltip.borderColor = 'rgba(240, 246, 252, 0.1)';
+      Chart.defaults.plugins.tooltip.borderWidth = 1;
+      Chart.defaults.plugins.tooltip.padding = 10;
+      Chart.defaults.plugins.tooltip.cornerRadius = 8;
+
+      const palette3D = ['#2f80ed', '#8b5cf6', '#27ae60', '#f39c12', '#e74c3c', '#14b8a6', '#ec4899', '#94a3b8', '#facc15'];
+
+      const originalChart = Chart;
+      window.Chart = new Proxy(originalChart, {
+        construct(target, args) {
+          const config = args[1];
+          if (config && config.data && Array.isArray(config.data.datasets)) {
+            config.data.datasets.forEach(function (ds) {
+              if (!ds.backgroundColor) {
+                ds.backgroundColor = palette3D;
+              }
+              if (config.type === 'bar' && typeof ds.backgroundColor === 'string') {
+                // keep single-color bars but add a slight gradient feel via opacity
+              }
+            });
+          }
+          return new target(...args);
+        }
+      });
+    }
+  </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="script.js?v=18"></script>
 
-  <!-- =========================
-       TOAST POPUP
-  ========================== -->
-  <div id="toastContainer" class="toast-container"></div>
+  <script>
+    // =====================
+    // SIDEBAR TOGGLE
+    // =====================
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      sidebar.classList.toggle('sidebar--open');
+      overlay.classList.toggle('overlay--visible');
+    }
 
-  <!-- =========================
-       CONFIRM MODAL
-  ========================== -->
-  <div id="confirmModal" class="confirm-modal">
-    <div class="confirm-box">
-      <h3 id="confirmTitle">Konfirmasi</h3>
-      <p id="confirmMessage">Apakah kamu yakin?</p>
+    function closeSidebarMobile() {
+      if (window.innerWidth < 1024) {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        sidebar.classList.remove('sidebar--open');
+        overlay.classList.remove('overlay--visible');
+      }
+    }
 
-      <div class="confirm-actions">
-        <button type="button" id="confirmCancelBtn" class="confirm-cancel">
-          Batal
-        </button>
+    // =====================
+    // SIDEBAR NAV ACTIVE STATE
+    // scrollKeFitur() di script.js hanya melakukan smooth scroll — ia tidak
+    // pernah memindahkan class "active" antar nav-item, jadi highlight
+    // dulu permanen menempel di item pertama. Kita tangani sendiri di sini:
+    // 1) saat nav-item diklik, langsung pindahkan highlight (instan, tidak
+    //    menunggu animasi scroll selesai)
+    // 2) IntersectionObserver menjaga highlight tetap akurat kalau user
+    //    scroll manual tanpa lewat sidebar sama sekali
+    // =====================
+    function setActiveNavItem(sectionId) {
+      document.querySelectorAll('.nav-item').forEach(function (item) {
+        item.classList.remove('active');
+      });
 
-        <button type="button" id="confirmOkBtn" class="confirm-ok">
-          Lanjutkan
-        </button>
-      </div>
-    </div>
-  </div>
+      const target = document.querySelector(
+        '.nav-item[data-section="' + sectionId + '"]'
+      );
+      if (target) target.classList.add('active');
+    }
 
-  <div id="aboutModal" class="about-modal">
-    <div class="about-modal-box">
-      <button type="button" class="about-close-btn" onclick="tutupTentangAplikasi()">
-        ✕
-      </button>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Wire up click handlers using the data-section attribute, so the
+      // highlight always matches whichever scrollKeFitur() target was used.
+      document.querySelectorAll('.nav-item[data-section]').forEach(function (item) {
+        item.addEventListener('click', function () {
+          setActiveNavItem(item.getAttribute('data-section'));
+        });
+      });
 
-      <div class="about-modal-header">
-        <p class="about-kicker">Project Portfolio</p>
-        <h2>Smart Expense Tracker</h2>
-        <p>
-          Aplikasi pintar berbasis web untuk mencatat, menghitung, dan menganalisis
-          pengeluaran harian dengan bantuan sistem deteksi cerdas.
-        </p>
-      </div>
+      // Scroll-based sync: whichever tracked section is most visible
+      // becomes the active nav-item, even on manual scroll.
+      const trackedSections = Array.from(
+        document.querySelectorAll('.nav-item[data-section]')
+      ).map(function (item) { return item.getAttribute('data-section'); });
 
-      <div class="about-feature-grid">
-        <div>
-          <strong>Login Admin & User</strong>
-          <span>Sistem akses terpisah antara admin dan user biasa.</span>
-        </div>
+      const sectionElements = trackedSections
+        .map(function (id) { return document.getElementById(id); })
+        .filter(Boolean);
 
-        <div>
-          <strong>Analisis Pengeluaran</strong>
-          <span>Menganalisis total harian, bulanan, rata-rata, target, dan pola pengeluaran.</span>
-        </div>
+      if (sectionElements.length > 0 && 'IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(function (entries) {
+          let mostVisible = null;
+          let bestRatio = 0;
 
-        <div>
-          <strong>Deteksi Cerdas</strong>
-          <span>Mendeteksi typo nama pengeluaran dan membantu menentukan kategori.</span>
-        </div>
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting && entry.intersectionRatio > bestRatio) {
+              bestRatio = entry.intersectionRatio;
+              mostVisible = entry.target.id;
+            }
+          });
 
-        <div>
-          <strong>Export PDF</strong>
-          <span>Menghasilkan laporan pengeluaran bulanan yang siap disimpan.</span>
-        </div>
-      </div>
+          if (mostVisible) setActiveNavItem(mostVisible);
+        }, {
+          root: null,
+          rootMargin: '-80px 0px -60% 0px',
+          threshold: [0.1, 0.25, 0.5, 0.75]
+        });
 
-      <div class="project-info-grid">
-        <div>
-          <span>Versi</span>
-          <strong>Prototype v18.0</strong>
-        </div>
+        sectionElements.forEach(function (el) { observer.observe(el); });
+      }
 
-        <div>
-          <span>Developer</span>
-          <strong>Riski Hidayat Pasaribu</strong>
-        </div>
+      // Default highlight before any scroll/click happens
+      setActiveNavItem('ringkasanSection');
+    });
 
-        <div>
-          <span>Fokus Project</span>
-          <strong>Web App, AI Analysis, Expense Management</strong>
-        </div>
+    // =====================
+    // BRIDGE: script.js (unmodified) writes the logged-in user's text
+    // into the hidden #userInfo span. We watch that span and mirror its
+    // text into the sidebar chip + topbar, so we never had to touch
+    // script.js's auth logic to get the new UI working.
+    // =====================
+    function mirrorUserInfo() {
+      const source = document.getElementById('userInfo');
+      const chip = document.getElementById('sidebarUserChip');
+      const avatar = document.getElementById('sidebarUserAvatar');
+      const nameEl = document.getElementById('sidebarUserName');
+      const topbarUser = document.getElementById('topbarUserInfo');
+      if (!source) return;
 
-        <div>
-          <span>Deployment</span>
-          <strong>GitHub Pages + Supabase</strong>
-        </div>
-      </div>
+      const nama = source.textContent.trim();
 
-      <p class="project-stack">
-        Tech Stack: HTML, CSS, JavaScript, Supabase, Gemini AI, Chart.js, jsPDF, dan GitHub Pages.
-      </p>
-    </div>
-  </div>
+      if (nama) {
+        if (chip) chip.style.display = 'flex';
+        if (avatar) avatar.textContent = nama.charAt(0).toUpperCase();
+        if (nameEl) nameEl.textContent = nama;
+        if (topbarUser) topbarUser.textContent = nama;
+      } else {
+        if (chip) chip.style.display = 'none';
+        if (topbarUser) topbarUser.textContent = '';
+      }
+    }
 
+    // Mirror the hidden #userSection bridge (toggled by script.js's login/logout
+    // flow via style.display) onto the actual visible logout button.
+    function mirrorLogoutButton() {
+      const source = document.getElementById('userSection');
+      const realBtn = document.getElementById('btnSidebarLogout');
+      if (!source || !realBtn) return;
+
+      const isVisible = source.style.display !== 'none' && source.style.display !== '';
+      realBtn.style.display = isVisible ? 'block' : 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const infoSource = document.getElementById('userInfo');
+      const sectionSource = document.getElementById('userSection');
+
+      mirrorUserInfo();
+      mirrorLogoutButton();
+
+      if (infoSource) {
+        new MutationObserver(mirrorUserInfo)
+          .observe(infoSource, { childList: true, characterData: true, subtree: true });
+      }
+
+      if (sectionSource) {
+        new MutationObserver(mirrorLogoutButton)
+          .observe(sectionSource, { attributes: true, attributeFilter: ['style', 'class'] });
+      }
+    });
+    // =====================
+    // KPI "Sisa Target": script.js tidak pernah mengisi elemen ini
+    // (kartu ini baru kita tambahkan di tema baru). Kita hitung sendiri
+    // di sini memakai variabel global `targetBulanan` & `prediksiAkhirBulan`
+    // yang sudah didefinisikan oleh script.js, tanpa mengubah script.js.
+    // =====================
+    function updateSisaTargetKPI() {
+      const el = document.getElementById('sisaTarget');
+      if (!el) return;
+
+      const target = (typeof targetBulanan !== 'undefined') ? targetBulanan : 0;
+      const prediksiEl = document.getElementById('prediksiBulan');
+      if (!prediksiEl) return;
+
+      if (!target || target <= 0) {
+        el.textContent = 'Belum diatur';
+        return;
+      }
+
+      // Re-parse the formatted Rupiah string back to a number ("Rp1.500.000" -> 1500000)
+      const angkaPrediksi = Number(
+        prediksiEl.textContent.replace(/[^0-9-]/g, '')
+      ) || 0;
+
+      const sisa = target - angkaPrediksi;
+      const formatted = new Intl.NumberFormat('id-ID', {
+        style: 'currency', currency: 'IDR', minimumFractionDigits: 0
+      }).format(Math.abs(sisa));
+
+      el.textContent = (sisa >= 0 ? formatted : '-' + formatted);
+      el.style.color = sisa >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const prediksiEl = document.getElementById('prediksiBulan');
+      if (prediksiEl) {
+        new MutationObserver(updateSisaTargetKPI)
+          .observe(prediksiEl, { childList: true, characterData: true, subtree: true });
+      }
+      updateSisaTargetKPI();
+    });
+  </script>
+
+  <script src="script.js?v=21"></script>
 </body>
-
 </html>

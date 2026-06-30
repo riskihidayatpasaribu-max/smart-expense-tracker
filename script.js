@@ -171,12 +171,12 @@ function togglePassword(inputId, button) {
 
   if (sedangTersembunyi) {
     input.setAttribute("type", "text");
-    button.innerText = "🙈";
+    button.innerText = "Sembunyikan";
     button.classList.add("password-visible");
     button.setAttribute("aria-label", "Sembunyikan password");
   } else {
     input.setAttribute("type", "password");
-    button.innerText = "👁";
+    button.innerText = "Lihat";
     button.classList.remove("password-visible");
     button.setAttribute("aria-label", "Tampilkan password");
   }
