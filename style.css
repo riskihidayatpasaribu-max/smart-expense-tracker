@@ -1146,16 +1146,59 @@ tbody td:first-child { color: var(--text-secondary); }
 /* --- Tabel daftar pengeluaran: separator tanggal + row striping --- */
 .date-separator-row td {
   background: var(--bg-elevated);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.date-separator-badge {
+  display: inline-flex;
+  align-items: center;
   font-weight: 700;
   font-size: 11px;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: var(--text-muted);
-  padding: 8px 12px;
+  color: var(--text-primary);
+  background: rgba(47, 128, 237, 0.15);
+  border: 1px solid rgba(47, 128, 237, 0.35);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+}
+
+.date-separator-total-badge {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--accent-orange);
+  background: rgba(243, 156, 18, 0.12);
+  border: 1px solid rgba(243, 156, 18, 0.3);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
 }
 
 .expense-row-even { background: transparent; }
 .expense-row-odd { background: rgba(240, 246, 252, 0.02); }
+
+/* --- Saran Pintar AI: kartu per poin (menggantikan blok teks panjang) --- */
+.saran-pintar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.saran-point-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent-purple);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
 
 /* --- Tombol aksi tabel: Lunas / Edit / Hapus --- */
 .btn-lunas,
@@ -1217,6 +1260,125 @@ tbody td:first-child { color: var(--text-secondary); }
   display: block !important;
 }
 
+/* --- Tombol aksi tabel Kontrol User: Nonaktifkan / Aktifkan / Hapus --- */
+.user-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.btn-user-disable,
+.btn-user-enable,
+.btn-user-delete {
+  width: auto;
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.btn-user-disable {
+  background: rgba(243, 156, 18, 0.12);
+  color: var(--accent-orange);
+  border: 1px solid rgba(243, 156, 18, 0.25);
+}
+.btn-user-disable:hover { background: rgba(243, 156, 18, 0.22); }
+
+.btn-user-enable {
+  background: rgba(39, 174, 96, 0.12);
+  color: var(--accent-green);
+  border: 1px solid rgba(39, 174, 96, 0.25);
+}
+.btn-user-enable:hover { background: rgba(39, 174, 96, 0.22); }
+
+.btn-user-delete {
+  background: rgba(231, 76, 60, 0.12);
+  color: var(--accent-red);
+  border: 1px solid rgba(231, 76, 60, 0.25);
+}
+.btn-user-delete:hover { background: rgba(231, 76, 60, 0.22); }
+
+/* --- Badge status user (Aktif / Nonaktif) di tabel Kontrol User --- */
+.user-status-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.user-status-badge.active {
+  background: rgba(39, 174, 96, 0.12);
+  color: var(--accent-green);
+}
+
+.user-status-badge.disabled {
+  background: rgba(231, 76, 60, 0.12);
+  color: var(--accent-red);
+}
+
+/* --- Badge hasil deteksi AI di tabel Riwayat Deteksi --- */
+.ai-history-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: rgba(139, 92, 246, 0.12);
+  color: var(--accent-purple);
+}
+
+/* --- Daftar item insight (Insight Item Sering Dibeli) --- */
+.item-insight-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.item-insight {
+  padding: 12px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.item-insight strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+/* --- Tombol loading state (dipakai saat Simpan/Saran Pintar diproses) --- */
+button.btn-loading {
+  opacity: 0.75;
+  cursor: not-allowed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: btnSpin 0.6s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes btnSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* ================================
    SCROLLBAR
 ================================ */
@@ -1276,7 +1438,7 @@ tbody td:first-child { color: var(--text-secondary); }
   .modal-box { padding: 20px; }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 360px) {
   .summary-grid { grid-template-columns: 1fr; }
   .login-card { padding: 24px 18px; }
 }

@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=21" />
+  <link rel="stylesheet" href="style.css?v=22" />
 </head>
 <body>
 
@@ -261,7 +261,9 @@
               <h2>Analisis Pengeluaran</h2>
               <span class="card-badge card-badge--info">Auto</span>
             </div>
-            <p id="analisisText" class="info-text">Belum ada data untuk dianalisis.</p>
+            <div id="analisisText" class="analysis-grid">
+              <p class="info-text">Belum ada data untuk dianalisis.</p>
+            </div>
           </section>
 
           <section id="saranPintarSection" class="card card--ai">
@@ -269,7 +271,7 @@
               <h2>Saran Pintar AI</h2>
               <span class="card-badge card-badge--ai">Gemini</span>
             </div>
-            <p id="saranPintarText">Klik tombol untuk membuat saran pintar berdasarkan pengeluaran bulan ini.</p>
+            <div id="saranPintarText" class="saran-pintar-list">Klik tombol untuk membuat saran pintar berdasarkan pengeluaran bulan ini.</div>
             <button type="button" id="btnSaranPintar" class="btn-ai" onclick="buatSaranPintarAI()">
               Buat Saran Pintar
             </button>
@@ -558,7 +560,7 @@
         <div><strong>Export PDF</strong><span>Laporan pengeluaran bulanan siap cetak.</span></div>
       </div>
       <div class="about-meta">
-        <div><span>Versi</span><strong>Prototype v19.0</strong></div>
+        <div><span>Versi</span><strong>Prototype v3.2</strong></div>
         <div><span>Developer</span><strong>Riski Hidayat Pasaribu</strong></div>
         <div><span>Stack</span><strong>HTML · CSS · JS · Supabase · Gemini AI</strong></div>
         <div><span>Deploy</span><strong>GitHub Pages + Supabase</strong></div>
@@ -794,12 +796,23 @@
       const el = document.getElementById('sisaTarget');
       if (!el) return;
 
-      const target = (typeof targetBulanan !== 'undefined') ? targetBulanan : 0;
       const prediksiEl = document.getElementById('prediksiBulan');
       if (!prediksiEl) return;
 
+      // NOTE: we deliberately do NOT use `typeof targetBulanan` here.
+      // script.js declares `let targetBulanan` in the global scope, but
+      // there's also an <input id="targetBulanan"> in the form — browsers
+      // auto-expose elements with an id as same-named globals (DOM
+      // clobbering). Before script.js's own `let` binding takes effect,
+      // `targetBulanan` can resolve to that HTMLInputElement instead of a
+      // number, which silently produces NaN. window['targetBulanan'] with
+      // an explicit Number() + isFinite() check sidesteps that entirely.
+      const rawTarget = window.targetBulanan;
+      const target = (typeof rawTarget === 'number' && isFinite(rawTarget)) ? rawTarget : 0;
+
       if (!target || target <= 0) {
         el.textContent = 'Belum diatur';
+        el.style.color = '';
         return;
       }
 
@@ -827,6 +840,6 @@
     });
   </script>
 
-  <script src="script.js?v=21"></script>
+  <script src="script.js?v=22"></script>
 </body>
 </html>

@@ -1081,28 +1081,43 @@ function tampilkanData() {
     return 0;
   });
 
-  let tanggalSebelumnya = "";
+  const totalPerTanggal = {};
 
-  dataTerfilter.forEach(function (item, index) {
+  dataTerfilter.forEach(function (item) {
+    const hargaSatuanItem = Math.round(Number(item.harga_satuan) || 0);
+    const qtyItem = Math.round(Number(item.qty) || 1);
+
+    totalPerTanggal[item.tanggal] =
+      (totalPerTanggal[item.tanggal] || 0) + hargaSatuanItem * qtyItem;
+  });
+
+  let tanggalSebelumnya = "";
+  let indexDalamTanggal = 0;
+
+  dataTerfilter.forEach(function (item) {
     if (item.tanggal !== tanggalSebelumnya) {
       const rowTanggal = document.createElement("tr");
       rowTanggal.className = "date-separator-row";
 
       rowTanggal.innerHTML = `
       <td colspan="9">
-        <span>${formatTanggalIndonesia(item.tanggal)}</span>
+        <span class="date-separator-badge">${formatTanggalIndonesia(item.tanggal)}</span>
+        <span class="date-separator-total-badge">Total: ${formatRupiah(totalPerTanggal[item.tanggal] || 0)}</span>
       </td>
     `;
 
       tabel.appendChild(rowTanggal);
       tanggalSebelumnya = item.tanggal;
+      indexDalamTanggal = 0;
     }
 
     const row = document.createElement("tr");
 
-    row.className = index % 2 === 0
+    row.className = indexDalamTanggal % 2 === 0
       ? "expense-row expense-row-even"
       : "expense-row expense-row-odd";
+
+    indexDalamTanggal++;
 
     const hargaSatuan = Math.round(Number(item.harga_satuan) || 0);
     const qty = Math.round(Number(item.qty) || 1);
@@ -1346,22 +1361,29 @@ function analisisPengeluaran() {
       const selisih = prediksiAkhirBulan - targetBulanan;
 
       analisisTarget = `
-Target bulanan: ${formatRupiah(targetBulanan)}
-Prediksi / total bulan dipilih: ${formatRupiah(prediksiAkhirBulan)}
-Status target: Melebihi target sekitar ${formatRupiah(selisih)}
+        <div class="analysis-stat-card analysis-stat-card--warning">
+          <span class="analysis-stat-label">Target Bulanan</span>
+          <span class="analysis-stat-value">${formatRupiah(targetBulanan)}</span>
+          <span class="analysis-stat-sub">Prediksi: ${formatRupiah(prediksiAkhirBulan)} · Melebihi ${formatRupiah(selisih)}</span>
+        </div>
       `;
     } else {
       const sisaTarget = targetBulanan - prediksiAkhirBulan;
 
       analisisTarget = `
-Target bulanan: ${formatRupiah(targetBulanan)}
-Prediksi / total bulan dipilih: ${formatRupiah(prediksiAkhirBulan)}
-Status target: Masih aman. Sisa dari target ${formatRupiah(sisaTarget)}
+        <div class="analysis-stat-card analysis-stat-card--good">
+          <span class="analysis-stat-label">Target Bulanan</span>
+          <span class="analysis-stat-value">${formatRupiah(targetBulanan)}</span>
+          <span class="analysis-stat-sub">Prediksi: ${formatRupiah(prediksiAkhirBulan)} · Sisa ${formatRupiah(sisaTarget)}</span>
+        </div>
       `;
     }
   } else {
     analisisTarget = `
-Target bulanan: Belum diatur
+      <div class="analysis-stat-card">
+        <span class="analysis-stat-label">Target Bulanan</span>
+        <span class="analysis-stat-value">Belum diatur</span>
+      </div>
     `;
   }
 
@@ -1371,9 +1393,12 @@ Target bulanan: Belum diatur
 
   if (kategoriTerbesar !== null) {
     teksKategori = `
-      Kategori terbesar bulan ini: ${kategoriTerbesar.nama}
-      Total kategori tersebut: ${formatRupiah(kategoriTerbesar.total)}
-      `;
+      <div class="analysis-stat-card">
+        <span class="analysis-stat-label">Kategori Terbesar</span>
+        <span class="analysis-stat-value">${kategoriTerbesar.nama}</span>
+        <span class="analysis-stat-sub">${formatRupiah(kategoriTerbesar.total)}</span>
+      </div>
+    `;
   }
 
   const analisisUtang = hitungAnalisisUtang();
@@ -1382,35 +1407,57 @@ Target bulanan: Belum diatur
 
   if (analisisUtang.jumlahUtangBelumLunas > 0 || analisisUtang.jumlahUtangLunas > 0) {
     teksUtang = `
-Analisis Utang/Bon:
-Total utang belum lunas: ${formatRupiah(analisisUtang.totalUtangBelumLunas)}
-Jumlah utang belum lunas: ${analisisUtang.jumlahUtangBelumLunas} transaksi
-Total utang sudah lunas: ${formatRupiah(analisisUtang.totalUtangLunas)}
-Jumlah utang sudah lunas: ${analisisUtang.jumlahUtangLunas} transaksi
-  `;
+      <div class="analysis-stat-card ${analisisUtang.jumlahUtangBelumLunas > 0 ? "analysis-stat-card--warning" : "analysis-stat-card--good"}">
+        <span class="analysis-stat-label">Utang/Bon</span>
+        <span class="analysis-stat-value">${formatRupiah(analisisUtang.totalUtangBelumLunas)}</span>
+        <span class="analysis-stat-sub">${analisisUtang.jumlahUtangBelumLunas} belum lunas · ${analisisUtang.jumlahUtangLunas} lunas</span>
+      </div>
+    `;
   } else {
     teksUtang = `
-Analisis Utang/Bon:
-Belum ada transaksi utang/bon pada periode ini.
-  `;
+      <div class="analysis-stat-card">
+        <span class="analysis-stat-label">Utang/Bon</span>
+        <span class="analysis-stat-value">Tidak ada</span>
+      </div>
+    `;
   }
 
-  analisisText.innerText = `
-Status: ${status}
+  const statusClassMap = {
+    Boros: "analysis-status-badge--warning",
+    Hemat: "analysis-status-badge--good",
+    Normal: "analysis-status-badge--neutral",
+    Riwayat: "analysis-status-badge--neutral"
+  };
 
-Total hari ini: ${formatRupiah(totalHariIni)}
-Total bulan dipilih: ${formatRupiah(totalBulanIni)}
-Rata-rata harian dari data yang ada: ${formatRupiah(rataRataHarian)}
-Jumlah hari dengan data: ${jumlahHariDenganData} hari
+  analisisText.innerHTML = `
+    <div class="analysis-status-row">
+      <span class="analysis-status-badge ${statusClassMap[status] || "analysis-status-badge--neutral"}">${status}</span>
+    </div>
 
-${analisisTarget}
+    <div class="analysis-stat-card">
+      <span class="analysis-stat-label">Total Hari Ini</span>
+      <span class="analysis-stat-value">${formatRupiah(totalHariIni)}</span>
+    </div>
 
-${teksKategori}
+    <div class="analysis-stat-card">
+      <span class="analysis-stat-label">Total Bulan Dipilih</span>
+      <span class="analysis-stat-value">${formatRupiah(totalBulanIni)}</span>
+    </div>
 
-${teksUtang}
+    <div class="analysis-stat-card">
+      <span class="analysis-stat-label">Rata-rata Harian</span>
+      <span class="analysis-stat-value">${formatRupiah(rataRataHarian)}</span>
+      <span class="analysis-stat-sub">${jumlahHariDenganData} hari ada data</span>
+    </div>
 
-Saran:
-${saran}
+    ${analisisTarget}
+    ${teksKategori}
+    ${teksUtang}
+
+    <div class="analysis-stat-card analysis-stat-card--saran">
+      <span class="analysis-stat-label">Saran</span>
+      <span class="analysis-stat-sub">${saran}</span>
+    </div>
   `;
 }
 
@@ -4332,54 +4379,55 @@ function tampilkanSaranPintarLokal() {
     );
   }
 
-  let saran = "";
+  const poin = [];
 
-  saran += `Total pengeluaran bulan dipilih: ${formatRupiah(totalBulan)}\n`;
-  saran += `Rata-rata pengeluaran harian: ${formatRupiah(rataRataHarian)}\n`;
+  poin.push(`Total pengeluaran bulan dipilih: ${formatRupiah(totalBulan)}`);
+  poin.push(`Rata-rata pengeluaran harian: ${formatRupiah(rataRataHarian)}`);
 
   const analisisUtang = hitungAnalisisUtang();
 
   if (analisisUtang.jumlahUtangBelumLunas > 0) {
-    saran += `\nAnalisis Utang/Bon:\n`;
-    saran += `Total utang belum lunas: ${formatRupiah(analisisUtang.totalUtangBelumLunas)}\n`;
-    saran += `Jumlah utang belum lunas: ${analisisUtang.jumlahUtangBelumLunas} transaksi\n`;
-    saran += `Rekomendasi: Prioritaskan melunasi utang/bon yang masih aktif sebelum menambah pengeluaran baru.\n\n`;
+    poin.push(
+      `Analisis Utang/Bon: Total utang belum lunas ${formatRupiah(analisisUtang.totalUtangBelumLunas)} dari ${analisisUtang.jumlahUtangBelumLunas} transaksi. Prioritaskan melunasi utang/bon yang masih aktif sebelum menambah pengeluaran baru.`
+    );
   } else if (analisisUtang.jumlahUtangLunas > 0) {
-    saran += `\nAnalisis Utang/Bon:\n`;
-    saran += `Semua utang/bon pada periode ini sudah lunas.\n`;
-    saran += `Rekomendasi: Pertahankan kebiasaan membayar utang tepat waktu.\n\n`;
+    poin.push(
+      `Analisis Utang/Bon: Semua utang/bon pada periode ini sudah lunas. Pertahankan kebiasaan membayar utang tepat waktu.`
+    );
   }
 
   const prediksiPintar = hitungPrediksiPintarAkhirBulan();
 
   if (prediksiPintar.bisaDiprediksi) {
-    saran += `Prediksi pintar akhir bulan: ${formatRupiah(prediksiPintar.prediksi)}\n`;
-    saran += `Rata-rata hari kerja: ${formatRupiah(prediksiPintar.rataHariKerja)}\n`;
-    saran += `Rata-rata akhir pekan: ${formatRupiah(prediksiPintar.rataWeekend)}\n`;
-    saran += `Catatan pola: ${prediksiPintar.catatan}\n\n`;
+    poin.push(
+      `Prediksi pintar akhir bulan: ${formatRupiah(prediksiPintar.prediksi)}. Rata-rata hari kerja ${formatRupiah(prediksiPintar.rataHariKerja)}, rata-rata akhir pekan ${formatRupiah(prediksiPintar.rataWeekend)}. ${prediksiPintar.catatan}`
+    );
 
     prediksiAkhirBulan = prediksiPintar.prediksi;
   } else {
     if (filterBulan === bulanSekarang && filterTahun === tahunSekarang) {
-      saran += `Prediksi akhir bulan: ${formatRupiah(prediksiAkhirBulan)}\n\n`;
+      poin.push(`Prediksi akhir bulan: ${formatRupiah(prediksiAkhirBulan)}`);
     } else {
-      saran += `Total akhir bulan tersebut: ${formatRupiah(prediksiAkhirBulan)}\n\n`;
+      poin.push(`Total akhir bulan tersebut: ${formatRupiah(prediksiAkhirBulan)}`);
     }
   }
 
   if (kategoriTerbesar) {
     const persenKategori = (kategoriTerbesar.total / totalBulan) * 100;
 
-    saran += `Kategori terbesar: ${kategoriTerbesar.nama}\n`;
-    saran += `Total kategori tersebut: ${formatRupiah(kategoriTerbesar.total)} (${persenKategori.toFixed(1)}%)\n\n`;
+    let saranKategori = "";
 
     if (persenKategori >= 50) {
-      saran += `Saran kategori: Pengeluaran ${kategoriTerbesar.nama} cukup dominan. Coba kurangi sedikit pada kategori ini agar pengeluaran lebih seimbang.\n\n`;
+      saranKategori = `Pengeluaran ${kategoriTerbesar.nama} cukup dominan. Coba kurangi sedikit pada kategori ini agar pengeluaran lebih seimbang.`;
     } else if (persenKategori >= 35) {
-      saran += `Saran kategori: Pengeluaran ${kategoriTerbesar.nama} cukup besar, tapi masih dalam batas wajar. Tetap pantau agar tidak mendominasi bulan ini.\n\n`;
+      saranKategori = `Pengeluaran ${kategoriTerbesar.nama} cukup besar, tapi masih dalam batas wajar. Tetap pantau agar tidak mendominasi bulan ini.`;
     } else {
-      saran += `Saran kategori: Pembagian kategori masih cukup seimbang.\n\n`;
+      saranKategori = `Pembagian kategori masih cukup seimbang.`;
     }
+
+    poin.push(
+      `Kategori terbesar: ${kategoriTerbesar.nama} sebesar ${formatRupiah(kategoriTerbesar.total)} (${persenKategori.toFixed(1)}%). ${saranKategori}`
+    );
   }
 
   if (targetBulanan > 0) {
@@ -4388,22 +4436,48 @@ function tampilkanSaranPintarLokal() {
       const sisaHari = Math.max(jumlahHariDalamBulan - hariIni.getDate(), 1);
       const penguranganPerHari = Math.ceil(selisih / sisaHari);
 
-      saran += `Status target: Prediksi melewati target bulanan.\n`;
-      saran += `Kelebihan prediksi: ${formatRupiah(selisih)}\n`;
-      saran += `Rekomendasi: Kurangi sekitar ${formatRupiah(penguranganPerHari)} per hari sampai akhir bulan agar lebih mendekati target.`;
+      poin.push(
+        `Status target: Prediksi melewati target bulanan sebesar ${formatRupiah(selisih)}. Kurangi sekitar ${formatRupiah(penguranganPerHari)} per hari sampai akhir bulan agar lebih mendekati target.`
+      );
     } else {
       const sisaTarget = targetBulanan - prediksiAkhirBulan;
 
-      saran += `Status target: Masih aman.\n`;
-      saran += `Perkiraan sisa dari target: ${formatRupiah(sisaTarget)}\n`;
-      saran += `Rekomendasi: Pertahankan pola pengeluaran sekarang. Jangan menaikkan pengeluaran harian terlalu jauh.`;
+      poin.push(
+        `Status target: Masih aman, perkiraan sisa dari target sekitar ${formatRupiah(sisaTarget)}. Pertahankan pola pengeluaran sekarang.`
+      );
     }
   } else {
-    saran += `Target bulanan belum diatur.\n`;
-    saran += `Rekomendasi: Atur target bulanan agar sistem bisa memberi saran penghematan yang lebih akurat.`;
+    poin.push(
+      `Target bulanan belum diatur. Atur target bulanan agar sistem bisa memberi saran penghematan yang lebih akurat.`
+    );
   }
 
-  saranText.innerText = saran;
+  renderSaranPintarPoin(poin);
+}
+
+function renderSaranPintarPoin(poin) {
+  const saranText = document.getElementById("saranPintarText");
+
+  if (!saranText) {
+    return;
+  }
+
+  if (!Array.isArray(poin) || poin.length === 0) {
+    saranText.innerText = "Belum ada saran yang bisa ditampilkan.";
+    return;
+  }
+
+  saranText.innerHTML = poin
+    .map(function (teksPoin) {
+      return `<div class="saran-point-card">${escapeHtml(teksPoin)}</div>`;
+    })
+    .join("");
+}
+
+function escapeHtml(teks) {
+  const div = document.createElement("div");
+  div.textContent = String(teks);
+  return div.innerHTML;
 }
 
 async function buatSaranPintarAI() {
@@ -4446,7 +4520,7 @@ async function buatSaranPintarAI() {
     `${analisisUtang.totalUtangLunas}-${analisisUtang.jumlahUtangLunas}`;
 
   if (cacheSaranPintarAI[cacheKey]) {
-    saranText.innerText = cacheSaranPintarAI[cacheKey];
+    renderSaranPintarPoin(cacheSaranPintarAI[cacheKey]);
     return;
   }
 
@@ -4499,16 +4573,16 @@ async function buatSaranPintarAI() {
 
     console.log("Hasil Saran Pintar:", hasil);
 
-    if (!response.ok || !hasil.success || !hasil.saran) {
+    if (!response.ok || !hasil.success || !Array.isArray(hasil.poin) || hasil.poin.length === 0) {
       tampilkanSaranPintarLokal();
       return;
     }
 
     if (hasil.source === "ai") {
-      cacheSaranPintarAI[cacheKey] = hasil.saran;
+      cacheSaranPintarAI[cacheKey] = hasil.poin;
     }
 
-    saranText.innerText = hasil.saran;
+    renderSaranPintarPoin(hasil.poin);
 
   } catch (error) {
     console.warn("Gagal mengambil saran pintar:", error);
